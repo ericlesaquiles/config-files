@@ -4616,10 +4616,10 @@ manually into the input field \"Port\" in the external TkTools window."
     (save-excursion
       (add-hook 'comint-preoutput-filter-functions 'eclipse-remove-empty-lines)
       (comint-send-string (eclipse-proc)
-													(concat eclipse-compile-string (buffer-string) "\n"))
+			  (concat eclipse-compile-string (buffer-string) "\n"))
       (if eclipse-eof-string
-					(comint-send-string (eclipse-proc) eclipse-eof-string)
-				(comint-send-eof eclipse-process-name))))) ;Send eof to eclipse process.
+	  (comint-send-string (eclipse-proc) eclipse-eof-string)
+	(comint-send-eof eclipse-process-name))))) ;Send eof to eclipse process.
 
 (defun eclipse-compile-region (compile beg end)
   "Send the region to an inferior ECLiPSe process and compile it."
@@ -4631,8 +4631,8 @@ manually into the input field \"Port\" in the external TkTools window."
       (comint-send-region (eclipse-proc) beg end)
       (comint-send-string (eclipse-proc) "\n") ;May be unnecessary
       (if eclipse-eof-string
-					(comint-send-string (eclipse-proc) eclipse-eof-string)
-				(comint-send-eof eclipse-process-name))))) ;Send eof to eclipse process.
+	  (comint-send-string (eclipse-proc) eclipse-eof-string)
+	(comint-send-eof eclipse-process-name))))) ;Send eof to eclipse process.
 
 (defun eclipse-compile-region-and-go (compile beg end)
   "Send the region to an inferior ECLiPSe process, compile it, and switch to

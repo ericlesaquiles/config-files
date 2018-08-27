@@ -58,10 +58,16 @@ plugins=(web-search git autojump)
 
 # User configuration
 
+# export ECLIPSEDIR="/home/ericles/Projetos/third-party-programs/eclipse/clp-2nd-try/bin/x86_64_linux"
+# export LD_LIBRARY_PATH="/home/ericles/Projetos/third-party-programs/eclipse/clp-2nd-try/lib/x86_64_linux" 
+
+# export MOSEKDIR="$HOME/Projetos/third-party-programs/mosek/mosek/8/tools/platform/linux64x86/bin"
+
 export PATH="$PATH":"usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/ericles/.gem/ruby/2.2.0/bin:/home/ericles/.gem/ruby/2.2.0/bin"
 export PATH="$PATH":"/usr/local/Wolfram/Mathematica/11.2/Executables"                             # Mathematica directory
 export PATH="$PATH:$(ruby -e 'print Gem.user_dir')/bin"
-export PATH="$PATH":"/home/ericles/Projetos/third-party-programs/eclipse/clp-2nd-try/bin/x86_64_linux"    # EclipseCLP directory
+export PATH="$PATH":"/home/ericles/Projetos/third-party-programs/eclipse/clp/bin/x86_64_linux" # Eclipse dir
+#export PATH="$PATH":"$MOSEKDIR"
 
 #export LD_LIBRARY_PATH="/home/ericles/Projetos/eclipse/eclipseclp.org/Distribution/Current/6.1_228_x86_64_linux/tcltk/x86_64_linux/lib"
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -85,6 +91,9 @@ export EDITOR='vim'
 # ssh
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 export LANG=en_US.UTF-8
+
+export EUSDIR=/home/ericles/Projetos/JSK/jsk-projects/Jskeus2/eus/Linux64
+
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -110,6 +119,7 @@ alias go='git checkout'
 alias gch='git checkout'
 alias s='git status'
 alias gt='git'
+alias gac='git commit -a -m'
 
 alias rke='bundle exec rake db:migrate'
 alias shut='systemctl poweroff'
@@ -128,6 +138,9 @@ alias pdf='okular'
 
 alias sleep='systemctl suspend'
 
+alias reus='rm eus[1-9]*'
+alias emcas='emacs'
+
 #alias gams /home/ericles/Documents/IC/LP/testing/gams/gams24.8_linux_x64_64_sfx/gams
 #alias gamslib /home/ericles/Documents/IC/LP/testing/gams/gams24.3_linux_x64_64_sfx/gamslib
 
@@ -136,14 +149,15 @@ set splitright
 #set -o vi # set vi as terminal editor
 bindkey '^R' history-incremental-search-backward
 
-# Trying to fix telegram's accentuation
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus
-export QT_IM_MODULE=ibus
-
-fortune
+#fortune
 . /usr/share/autojump/autojump.sh
 
-#source /opt/ros/indigo/setup.bash
 source /opt/ros/kinetic/setup.zsh
 
+#
+# bashrc.eus : environment variable for euslisp 
+#
+export EUSDIR=/home/ericles/Projetos/JSK/jsk-projects/jskeus/eus 
+export ARCHDIR=Linux64 
+export PATH=$EUSDIR/$ARCHDIR/bin:$EUSDIR/$ARCHDIR/lib:$PATH 
+export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH 
