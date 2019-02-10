@@ -1,16 +1,17 @@
 
 ;; ----- smex-history -----
 (
+ mechanics
+ run-scheme
  cd
  5x5
  arp
  dbx
  dig
- erc
- ert
 )
 
 ;; ----- smex-data -----
 (
- 
+ (run-scheme . 4)
+ (mechanics . 6)
 )

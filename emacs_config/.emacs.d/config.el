@@ -10,13 +10,15 @@
 
 (global-subword-mode 1)
 
-(defun kill-whole-word ()
+(defun kill-previous-word ()
   (interactive)
   (backward-word)
   (kill-word 1))
-(global-set-key (kbd "C-c w w") 'kill-whole-word)
+(global-set-key (kbd "C-c w p") 'kill-previous-word)
 
 (menu-bar-mode -1)
+(tool-bar-mode 0)
+(scroll-bar-mode -1)
 
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
@@ -24,6 +26,28 @@
       `((".*" ,temporary-file-directory t)))
 
 (global-linum-mode t)
+
+(global-set-key (kbd "C-c l k") 'kill-whole-line)
+
+(defun daedreth/copy-whole-line ()
+  "Copies a line without regard for cursor position."
+  (interactive)
+  (save-excursion
+    (kill-new
+     (buffer-substring
+      (point-at-bol)
+      (point-at-eol)))))
+(global-set-key (kbd "C-c l c") 'daedreth/copy-whole-line)
+
+(defun kill-forward-word ()
+  (interactive)
+  (kill-word 1))
+(global-set-key (kbd "C-c w f") 'kill-forward-word)
+
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
+
+(setq powerline-default-separator nil)
 
 (use-package hungry-delete
   :ensure t
@@ -39,43 +63,101 @@
 
 (use-package sudo-edit
   :ensure t
-  :bind ("M-s e" . sudo-edit))
+  :bind
+    ("s-e" . sudo-edit))
 
-(load (expand-file-name "~/.roswell/helper.el"))
-(setq inferior-lisp-program "ros -Q run")
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(safe-local-variable-values
-   (quote
-    ((Package . Kernel)
-     (Log . C\.Log)
-     (Package . LISP)
-     (Package . KERNEL)
-     (Package . Lisp)
-     (Log . code\.log)
-     (Package . conditions)
-     (Lowercase . T)
-     (Base . 10)
-     (Package . loop)
-     (whitespace-style quote
-                       (face trailing empty tabs))
-     (whitespace-action)))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 
-(setq create-lockfiles nil)
+(use-package expand-region
+  :ensure t
+  :bind ("C-q" . er/expand-region))
+
+(use-package switch-window
+  :ensure t
+  :config
+    (setq switch-window-input-style 'minibuffer)
+    (setq switch-window-increase 4)
+    (setq switch-window-threshold 2)
+    (setq switch-window-shortcut-style 'qwerty)
+    (setq switch-window-qwerty-shortcuts
+        '("a" "s" "d" "f" "j" "k" "l" "i" "o"))
+  :bind
+    ([remap other-window] . switch-window))
+
+(use-package fancy-battery
+  :ensure t
+  :config
+    (setq fancy-battery-show-percentage t)
+    (setq battery-update-interval 30)
+    (if window-system
+      (fancy-battery-mode)
+      (display-battery-mode)))
+
+(add-to-list 'org-structure-template-alist
+               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+
+;; (load (expand-file-name "~/.roswell/helper.el"))
+;; (setq inferior-lisp-program "ros -Q run")
+;; (custom-set-variables
+;;  ;; custom-set-variables was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(safe-local-variable-values
+;;    (quote
+;;     ((Package . Kernel)
+;;      (Log . C\.Log)
+;;      (Package . LISP)
+;;      (Package . KERNEL)
+;;      (Package . Lisp)
+;;      (Log . code\.log)
+;;      (Package . conditions)
+;;      (Lowercase . T)
+;;      (Base . 10)
+;;      (Package . loop)
+;;      (whitespace-style quote
+;;                        (face trailing empty tabs))
+;;      (whitespace-action)))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  )
+
+;; (setq create-lockfiles nil)
 
 ;(setq slime-lisp-implementations
       ;'((sbcl ("sbcl" "--core" "~/.emacs.d/sbcl.core-for-slime"))))
 
 (global-set-key "\C-cs" 'slime-selector)  ;; Set key binding to slime-selector
+
+(use-package racket-mode
+  :ensure t)
+
+(use-package paredit
+             :ensure t
+             :config
+(add-hook 'racket-mode-hook #'enable-paredit-mode))
+
+;; (use-package scheme-smart-complete
+;;   :ensure t)
+
+(setq scheme-program-name "racket")
+
+(setq auto-mode-alist (cons '("\\.scm" . racket-mode) auto-mode-alist))
+
+(use-package geiser
+  :ensure t)
+
+(defun mechanics ()
+  (interactive)
+  (run-scheme 
+   "/usr/local/scmutils/mit-scheme/bin/scheme --library /usr/local/scmutils/mit-scheme/lib"
+  ))
 
 (autoload 'eclipse-mode "/home/ericles/.emacs.d/eclipse_emacs/eclipse.el" "ECLIPSE editing mode" t)
 (setq auto-mode-alist (cons '("\\.pl" . eclipse-mode) auto-mode-alist))
@@ -86,38 +168,38 @@
        '("\\.m$" . octave-mode)
        auto-mode-alist))
 
-;; (use-package tex-site
-;;   :ensure auctex
-;;   :mode ("\\.tex\\'" . latex-mode)
-;;   :config
-;;   (setq TeX-auto-save t)
-;;   (setq TeX-parse-self t)
-;;   (setq-default TeX-master nil)
-;;   ;; (add-hook 'LaTeX-mode-hook
-;;   ;;             (lambda ()
-;;   ;;               (rainbow-delimiters-mode)
-;;   ;;               (company-mode)
-;;   ;;               (smartparens-mode)
-;;   ;;               (turn-on-reftex)
-;;   ;;               (setq reftex-plug-into-AUCTeX t)
-;;   ;;               (reftex-isearch-minor-mode)
-;;   ;;               (setq TeX-PDF-mode t)
-;;   ;;               (setq TeX-source-correlate-method 'synctex)
-;;   ;;               (setq TeX-source-correlate-start-server t))
-;;   ;;     )
+(use-package tex-site
+  :ensure auctex
+  :mode ("\\.tex\\'" . latex-mode)
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (rainbow-delimiters-mode)
+                (company-mode)
+                (smartparens-mode)
+                (turn-on-reftex)
+                (setq reftex-plug-into-AUCTeX t)
+                (reftex-isearch-minor-mode)
+                (setq TeX-PDF-mode t)
+                (setq TeX-source-correlate-method 'synctex)
+                (setq TeX-source-correlate-start-server t))
+      )
 
-;;   ;; ;; Update PDF buffers after successful LaTeX runs
-;;   ;; (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-;;   ;;             #'TeX-revert-document-buffer)
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+              #'TeX-revert-document-buffer)
 
-;;   ;; ;; to use pdfview with auctex
-;;   ;; (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+  ;; to use pdfview with auctex
+  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
 
-;;   ;; ;; to use pdfview with auctex
-;;   ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
-;;   ;;         TeX-source-correlate-start-server t)
-;;   ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
-;;   )
+  ;; to use pdfview with auctex
+  (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+          TeX-source-correlate-start-server t)
+  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
+ )
 
 ;; (use-package auctex
 ;;   :ensure t)
@@ -171,6 +253,14 @@
   ("M-x" . smex))
 
 (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+
+(use-package magit
+  :ensure t
+  :config
+  (setq magit-push-always-verify nil)
+  (setq git-commit-summary-max-length 50)
+  :bind
+  ("M-g" . magit-status))
 
 (global-set-key (kbd "C-x b") 'ibuffer)
 

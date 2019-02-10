@@ -1,0 +1,80 @@
+;;; -*- coding: utf-8 -*-
+
+;; ----- ido-last-directory-list -----
+(
+ ("/home/ericles/Projetos/Mec/" . "scmutils/")
+ ("/home/ericles/Projetos/Programming/" . "Lisp/")
+ ("/home/ericles/Projetos/Prolog/doc/" . "Cap1/")
+ ("/home/ericles/Projetos/Prolog/" . "doc/")
+ ("/home/ericles/Projetos/" . "Mec/")
+ ("/home/ericles/" . "Projetos/")
+ ("/" . "home/")
+)
+
+;; ----- ido-work-directory-list -----
+(
+ "/home/ericles/Projetos/Mec/"
+ "/home/ericles/Projetos/mechanics/"
+ "/home/ericles/.emacs.d/"
+ "/home/ericles/Projetos/Mini-curso-Scheme/"
+ "/home/ericles/Projetos/Prolog/doc/Cap1/"
+ "/home/ericles/Projetos/Prolog/doc/Cap0/"
+ "/home/ericles/home/ericles/"
+)
+
+;; ----- ido-work-file-list -----
+(
+ "e.scm"
+ "experiments.scm"
+ "test.scm"
+ "init.el"
+ "reason.rkt"
+ "[LOG]Cap1.tex"
+ "[LOG]Cap0.tex"
+ "Projetos"
+ "config.el"
+)
+
+;; ----- ido-dir-file-cache -----
+(
+ ("/home/ericles/Projetos/Mec/" (23645 58428 151546 846000) "bin/" "../" "scmutils-20160827-x86-64-gnu-linux.tar.gz" "./" "e.scm" "scmutils/")
+
+ ("/home/ericles/" (23645 58210 632444 114000) ".vim/" ".ssh/" ".tmux.conf" "Documents/" "Desktop/" ".xsessionrc" ".gconf/" "Projetos/" ".compiz/" ".sudo_as_admin_successful" ".gimp-2.8/" ".oh-my-zsh/" ".steampid" ".xsession-errors" ".bashrc" "Downloads/" ".zshrc" ".vimrc" ".xmodmap" ".cache/" "Shelf/" ".mozilla/" ".emacs.d/" ".zcompdump-ericles-T480s-5.1.1" ".dbus/" "config-files/" ".Xauthority" ".zsh_history" ".emacs.d.bkp/" "Externo/" ".edwin" "Music/" ".geiser_history.racket" ".steam/" ".pulse-cookie" ".fehbg" ".gem/" "test.mp4" ".ros/" ".kde/" ".bash_logout" ".thumbnails/" ".ICEauthority" ".ecryptfs/" "Steam/" "Public/" "odyssey/" ".profile" ".config/" ".w3m/" ".modmap.sh" ".gnupg/" ".bash_history" "Videos/" ".local/" ".xbindkeysrc" ".Xresources" ".java/" ".xsession-errors.old" ".pki/" ".gitconfig" ".zcompdump" "Pictures/" ".steampath" ".viminfo" ".dmrc" "Templates/" ".bundle/" ".Private/" "../" "./")
+
+ ("/home/ericles/Projetos/mechanics/" (23645 58052 486912 804000) "../" "./" "#scratch#" "scratch" "test.scm")
+
+ ("/home/ericles/.emacs.d/" (23645 57902 701039 557000) "sbcl.core-for-slime" "eclipse_emacs/" "eclipse_emacs.tgz" "../" "test.org" "config.org" "init.el" "./" "auto-save-list/" "tramp" "linum-off/" "smex-items" "eshell/" "ido.last" "config.el" "elpa/")
+
+ ("/home/ericles/Projetos/Mec/scmutils/" (22465 61516 0 0) "../" "manual/" "./" "src/" "mit-scheme/")
+
+ ("/home/ericles/Projetos/Mec/bin/" (22465 61510 0 0) "../" "./" "mechanics")
+
+ ("/home/ericles/Documents/" (23603 63213 376653 311000) "../" "roscon/" "Financeiro/" "bookmarks_12_25_18.html" "./" "Partitas/" "USP/" "TabletM708 Manual.pdf" "Student Chapter/" "scripts/" "Presentations/" "bookmarks-2018-12-25.json" "Certificados/" "Livros/" "Trabalho/")
+
+ ("/home/ericles/Documents/Livros/" (23607 40053 766049 182000) "[HUM][LIN][GER] Modern German grammar workbook-Routledge (2003).pdf" "[POE][WIL][SHA] William_ShakespeareThe_Oxford_Shakespeare_The_Complete_Works_2nd_Edition.pdf" "(Webster's Korean Thesaurus Edition) Thomas Paine-Common Sense -ICON Group International, Inc. (2006).pdf" "[LNG][JAP] Curso da NHK.pdf" "[MAT][ALG][LIS] Algebra2017-Lista3.pdf" "pdfs/" "F Spufford-Red Plenty-Faber and Faber (2010).epub" "Lester Ingber-Elements of advanced karate-Ohara Publications (1985).pdf" "[BIO][GEN] Peter Anthony Lawrence-The making of a fly_ the genetics of animal design  -Blackwell Scientific Publications (1992).pdf" "Daniel J. Levitin-This is Your Brain on Music. Science of a Human Obsession-Penguin Audio (2007).pdf" "[HUM][ML][MIN] Harry Harrison, Marvin Minsky-The Turing Option_ A Novel-Little, Brown and Company (1992).pdf" "[HUM][LIT] Book of Tea 2.pdf" "[MAT][IMA] Complex Analisys.pdf" "[HUM][EDU] Emailing 04-11-16-viagem-a-escola-do-seculo-xxi2.pdf" "[MAT][GEN][KOL] A Matematica e o Senso Comum.pdf" "Mas Oyamas-Mas Oyama's Essential Karate-Sterling Publishing (1978).pdf" "[HUM][LIN][GER] Modern German Grammar-Routledge (2003).pdf" "sax/" "An_Essay_Concerning_Human_Understanding.pdf" "[HUM][LIT][JLB] Jorge Luis Borges-Obras Completas 1923-1972 (1984).pdf" "[HUM][LNG] Noam Chomsky-Language and mind-Cambridge University Press (2006).pdf" "[MAT][EXACT] ChenJ.pdf" "[LIT][FIL] Antoine_de_Saint-Exupéry_Terre_des_hommes__.pdf" "(Perennial Bestseller Collection) Vladimir Vladimirovich Nabokov-Lolita (Perennial Bestseller Collection)-G K Hall & Co (1997).pdf" "[LIN][JAP] Read real Japanese fiction _ short stories by contemporary writers-Kodansha International (2008.).pdf" "[FIL][JSM]John Stuart Mill-A System of Logic  -eBooks@Adelaide (2011).pdf" "[HUM][LIN][JAP] James W. Heisig-Remembering the Kanji vol. I-Japan Publications Trading Company (2001).pdf" "[MAT][RING] StructureTheorem.pdf" "vipassana-for-hackers.pdf" "Noam Chomsky-Who Rules the World_-Metropolitan Books (2016).epub" "Singer, Michael A-The untethered soul _ the journey beyond yourself-New Harbinger Publications, Inc. (2007).epub" "Gennosuke Higaki-Hidden karate_ the true bunkai for the Heian katas and Naihanchi-KIAI (2006).pdf" "[HUM][LIN][JAP] Naoko Chino-Japanese Verbs at a Glance (Power Japanese Series)-Kodansha International (1996).pdf" "[HUM][ANT][SAN] Antoine_de_Saint-Exupery_Le_Petit_Prince.pdf" "[HUM][FIL][HORK] (Continuum Impacts) Horkheimer, Max-EPZ Eclipse of Reason-Bloomsbury Academic_Continuum (2004).pdf" "Bertrand Russell-The Philosophy of Leibniz-Routledge (1992).pdf" "[FIL][TP] Thomas Paine-Age of Reason_ The Definitive Edition-Michigan Legal Publishing Ltd. (2014).epub" "Kakuzo Okakura-The Book of Tea -Dover Publications (1964).pdf" "[HUM][FIL] Wing-Tsit Chan-A Source Book in Chinese Philosophy (1969).pdf" "Humanas/" "Jason_ Whitman, Walt-Leaves of grass, 1860 _ the 150th anniversary facsimile edition-University of Iowa Press (2009).pdf" "[HUM][PSI] Maria_Konnikova_The_Confidence_Game_Why_We_Fall_for_It_._._._Every_Time.epub" "Bertrand_Russell_Power_A_New_Social_Analysis_.pdf" "(Schocken Classics Series) Franz Kafka-Diaries, 1910-1923-Schocken (1988).epub" "Exatas/" "Ramesh C. Chandan, Charles H. White, Arun Kilara, Y.H. Hui - Manufacturing Yogurt and Fermented Milks-Blackwell Pub (2006).pdf" "[ART][GEN] The Harvard Medical School Guide to Tai Chi_ 12 Weeks to a Healthy Body, Strong Heart, and Sharp Mind-Shambhala.epub" "[PSI] Maria_Konnikova_The_Confidence_Game_Why_We_Fall_for_It_._._._Every_Time.epub" "[HUM][LIT][JLB] Jorge Luis Borges-Obras completas 1975-1985 (Spanish Edition)-Emece Editores (1989).pdf" "../" "./")
+
+ ("/home/ericles/Documents/Livros/Exatas/" (23583 65047 678426 945000) "../" "MAT/" "./" "notas/" "papers/" "COM/" "FIS/")
+
+ ("/home/ericles/Documents/Livros/Exatas/FIS/" (23608 58254 948247 731000) "[FIS][MEC] V. I. Arnold, A. Weinstein, K. Vogtmann - Mathematical Methods Of Classical Mechanics-Springer (1989).djvu" "../" "[FIS][OSC] Herch Moyses Nussenzveig-Curso de Fisica Basica_ Fluidos_ Oscilacoes e Ondas_ Calor - Vol. 2-Edgard Blucher (2001).pdf" "[FIS][QUA] Física quantica para matemáticos.pdf" "[FIS][GEN] Roger Penrose-The Road to Reality  A Complete Guide to the Laws of the Universe-Vintage (2007).pdf" "[FIS][MAT] V. I. Arnold-Mathematical Understanding of Natur.djvu" "[FIS][COM] Aaronson S.-Quantum Computing since Democritus-Cambridge University Press (2013).pdf" "./" "[FIS][MEC] Notas de aula Vibrações e Ondas ITVO_part1.pdf" "[FIS][MEC] Gerald Jay Sussman, Jack Wisdom-Structure and interpretation of classical mechanics-The MIT Press (2001).djvu" "[FIS][MEC] Moyses Nussenzveig-Curso de Física Básica_ Mecânica - Vol. 1-Edgard Blucher (2002).pdf" "[FIS][MEC] Daniel_Kleppner,_Robert_Kolenkow_An_Introduction_To_Mechanics.djvu" "Born M.-Natural philosophy of cause and chance-OUP (1951).djvu" "[FIS][SIM] Atomic Simulations.zip" "naturalphilosoph032159mbp.pdf" "[FIS][MEC] Mark Levi - The Mathematical Mechanic_ Using Physical Reasoning to Solve Problems-Princeton University Press (2009).pdf" "[FIS][MEC] Alexei Ondas notas de aula IMPA.pdf" "Mark Levi-Why Cats Land on Their Feet_ And 76 Other Physical Paradoxes and Puzzles-Princeton University Press (2012).epub")
+
+ ("/home/ericles/Projetos/Programming/Lisp/" (23640 25402 940953 100000) "../" "JSK/" "./" "euslisp/" "IA/" "Kenzo/" "ansi-test/" "Mini-curso-Scheme/" "Scheme-Racket/")
+
+ ("/home/ericles/Projetos/Programming/" (23640 25352 605229 388000) "../" "./" "automatic-theorem-proving/" "Lisp/" "Convex-Engeneering/" "C/")
+
+ ("/home/ericles/Projetos/" (23640 25352 605229 388000) "../" "Blog/" "./" "transcripts/" "Prolog/" "Sage/" "Mec/" "Manga/" "Papers/" "mechanics/" "StudentChapterUSP.github.io/" "Math Vídeos/" "Programming/" "Tests/")
+
+ ("/home/ericles/Projetos/Prolog/doc/Cap0/" (23639 25682 72771 944000) "../" "./" "[LOG]Cap0.pdf" "_minted-[LOG]Cap0/" "[LOG]Cap0.tex" ".aspell.pt_BR.prepl" "[LOG]Cap0.lol")
+
+ ("/home/ericles/Projetos/Mini-curso-Scheme/" (23586 22840 194173 0) "../" ".git/" "./" "Model.scm")
+
+ ("/home/ericles/Projetos/Prolog/doc/Cap1/" (23586 20472 922060 0) "../" "[LOG]Cap1.tex" "./" ".aspell.pt_BR.prepl" "analogy.jpg" "_minted-[LOG]Cap1/" "[LOG]Cap1.pdf")
+
+ ("/home/ericles/Projetos/Prolog/doc/" (23586 20477 522541 0) "Cap14/" "Cap8/" "Cap16/" ".gitignore" "Exemplos/" "../" "Cap15/" "Cap6/" ".updateMinted.sh" "./" "Cap12/" "texput.log" "Cap11/" "Cap5/" "Cap4/" "Cap1/" "Cap9/" "Cap7/" "Cap3/" "Intro/" "TODO.org" "PROBLEMS.org" "header.tex" "Cap10/" "Cap0/" "Cap17/" "Capa/" "Cap13/" "Complete/" "Cap2/")
+
+ ("/home/ericles/Projetos/Prolog/" (23586 20477 788425 0) ".gitignore" "../" ".git/" "doc/" "./" "programas_exemplo/" "README.md")
+
+ ("/home/" (23578 41934 262184 622000) "../" "ericles/" "./" ".ecryptfs/")
+)
+
+;; ----- ido-unc-hosts-cache -----
+t
