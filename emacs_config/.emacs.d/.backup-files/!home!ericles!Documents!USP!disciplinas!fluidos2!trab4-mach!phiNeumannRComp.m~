@@ -1,0 +1,153 @@
+
+h = 4;
+l = 6;
+
+n_x = 120;	# linhas
+n_y = 80;	# colunas
+
+dy = @(i) h/n_y;
+dx = @(i) l/n_x;
+dyhat = @(i) h/n_y;
+dxhat = @(i) l/n_x;
+
+posy    = @(j) j * (h)/n_y;
+posx    = @(i) i * (l)/n_x;
+
+Phin = zeros(n_y, n_x);
+Phi  = zeros(n_y, n_x);
+
+har = @(a,b) 1/(1/a + 1/b);	# harmonic mean of a and b
+a   = 340;			        # sound speed
+
+obstacleList = [];		# each obstacle is a list of vertices of the form [[x y] [x y]]
+
+aw = @(i,j) i == 1;
+as = @(i,j) j == 1;
+ae = @(i,j) i == n_x;
+an = @(i,j) j == n_y;
+isIn = @(i, j) 	((i > 1) && (j > 1) && (j < n_y) && (i < n_x));
+
+## Flux function
+function fl = flu (i, j, posy, posx, n_x, a)
+  if(i == 1)
+    fl = a/8;
+  elseif (i == n_x)
+    fl = a/4;
+  else
+    fl = 0;
+  end
+end
+fluxo = @(i,j) flu(i,j,posy,posx,n_x,a);
+
+## Finite difference functions
+function dxij = dxphi (i, j, del, Phi, isIn, fluxo, aw, as, ae, an)
+  if ((isIn(i,j) || as(i,j) || an(i,j)) && !aw(i,j) && !ae(i,j))
+    dxij = (Phi(j, i + 1) - Phi(j, i - 1))/(2*del); # central difference
+  elseif fluxo(i,j)
+    if (aw(i,j)) dxij = (fluxo(i,j) + (Phi(j,i+1) - Phi(j,i)))/(1.5*del); # skewed difference
+    else         dxij = (fluxo(i,j) + (Phi(j,i) - Phi(j,i-1)))/(1.5*del); #
+    end
+  else
+    dxij = 0;
+  end
+end
+
+function dyij = dyphi (i, j, del, Phi, isIn, fluxo, aw, as, ae, an)
+  if ((isIn(i,j) || aw(i,j) || ae(i,j)) && !as(i,j) && !an(i,j))
+    dyij = (Phi(j + 1, i) - Phi(j - 1, i))/(2*del); # central difference
+  elseif (as(i,j) || an(i,j))
+    dyij = 0;
+  end
+end
+
+## prepare for iteration
+size     = n_x*n_y;
+A        = sparse(size,size);
+b        = zeros(size, 1);
+err      = 1;
+erro_min = 1e-4;
+it       = 0;
+while err > erro_min
+
+
+  ## Rho definition
+  DxPhi = @(i,j) dxphi(i,j, dx(i), Phi, isIn, fluxo, aw, as, ae, an); #
+  DyPhi = @(i,j) dyphi(i,j, dy(j), Phi, isIn, fluxo, aw, as, ae, an); #
+  Ma2 = @(i,j,u,v) (u^2 + v^2)/a^2;
+  rho = @(i,j) 1/2;
+  ## rho = @(i,j) (1 + Ma2(i,j,DxPhi(i,j),DyPhi(i,j))/5)^(-5/2);
+
+  for j=1:n_y
+    for i=1:n_x
+      
+      k = i + (j - 1)*n_x;
+      kp = (i + 1) + (j - 1)*n_x;
+      km = (i - 1) + (j - 1)*n_x;
+      kpp = i + ((j + 1) - 1)*n_x;
+      kmm = i + ((j - 1) - 1)*n_x;
+
+      ## West integral
+      if (!aw(i,j))
+	coef     = 2*(dy(j)/dx(i)) * har(rho(i,j),rho(i-1,j));
+	A(k,k)  -= coef;
+	A(k,km) += coef;
+      elseif (aw(i,j) && fluxo(i,j))
+	b(k)    -=  2*dy(j) * har(rho(i,j),rho(i,j)) * fluxo(i,j);
+      end
+
+      ## South Integral
+      if (!as(i,j))
+	coef      = 2*(dx(j)/dy(i)) * har(rho(i,j),rho(i,j-1));
+	A(k,k)   -= coef;
+	A(k,kmm) += coef;
+      end
+
+      ## East Integral
+      if (!ae(i,j))
+	coef     = 2*(dy(j)/dx(i)) * har(rho(i,j),rho(i+1,j));
+	A(k,k)  -= coef;
+	A(k,kp) += coef;
+      elseif (ae(i,j) && fluxo(i,j))
+	b(k)    -= 2*dy(j) * har(rho(i,j),rho(i,j)) * fluxo(i,j);
+      end
+
+      ## North Integral
+      if (!an(i,j))
+	coef      = 2*(dx(j)/dy(i)) * har(rho(i,j),rho(i,j+1));
+	A(k,k)   -= coef;
+	A(k,kpp) += coef;
+      end
+    end
+  end
+
+  Phin = A\b;
+  Phin = reshape(Phin, n_x, n_y)';
+  ## figure(1)
+  contour(Phin,50);
+
+  ## ## numero de mach e massa específica
+  ## figure(2)
+  ## Ma = zeros(n_y,n_x);
+  ## Ro = zeros(n_y,n_x);
+  ## for i = 1:n_x
+  ##   for j = 1:n_y
+  ##     Ma(i,j)  = sqrt(Ma2(i,j,DxPhi(i,j),DyPhi(i,j)));
+  ##     Ro(i,j)  = rho(i,j);
+  ##   end
+  ## end
+  ## contour(Ma);
+  ## contour(Ro);
+
+  ## save to file
+  ## print(sprintf("solution%08d.png",it),"-dpng");
+  
+  err  = norm(Phin(:) - Phi(:))/norm(Phin(:));
+  Phi  = Phin;
+  it  += 1;
+
+  fprintf("%d iterations, error being %d\n", it, err);
+end
+
+
+PHI = reshape (A'\b, n_x', n_y')';
+contour(PHI,50);

@@ -1,0 +1,209 @@
+
+h = 4;
+l = 6;
+
+eixo_x = 60;				# linhas
+eixo_y = 40;				# colunas
+
+dy = @(i) h/eixo_y;
+dx = @(i) l/eixo_x;
+dyhat = @(i) h/eixo_y;
+dxhat = @(i) l/eixo_x;
+
+## substitui um if ternário
+## fluxo = @(i,j) (((i == 1) && (j < eixo_x/h)) * 5) || (((i == eixo_y) && (j >  3*(eixo_x/h))) * 5) || 0;
+fluxo = @(i,j) (((i == 1) && (j < eixo_y/h)) || ((i == eixo_x) && (j >  3*(eixo_y/h)))) * 5;
+
+A = sparse(zeros(eixo_x*eixo_y,eixo_x*eixo_y));
+
+for j=1:eixo_y
+  for i=1:eixo_x
+    k = i + (j - 1)*eixo_x;
+    kp = (i + 1) + (j - 1)*eixo_x;
+    km = (i - 1) + (j - 1)*eixo_x;
+    kpp = i + ((j + 1) - 1)*eixo_x;
+    kmm = i + ((j - 1) - 1)*eixo_x;
+
+    ## 
+    ## 9 casos (interior, 4 bordas e 4 cantos
+    ## Precisa definir A(k,k), A(k,kp,) A(k,km), A(k,kpp), A(k,kmm), b(k)
+    ## ##  
+    
+    ## sem condição de contorno
+    if (i >= 2 && j >= 2 && i < eixo_x && j< eixo_y)
+      ## fprintf("sem cond %i %i \n", i,j)
+      
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) + dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+
+      ## canto inferior esquerdo
+      ## adiciona integral oeste (-5dy) em b
+      ## e leste em Akk e adiciona termos Akm Akp 
+    elseif (j == 1 && i == 1)
+      ## fprintf("inf esq \n")
+      
+      A(k,k)   = -(dx(i)/dyhat(j) + dy(j)/dxhat(i-1));
+      A(k,kpp) = dx(i)/dyhat(j);
+      A(k,kp)  = dy(j)/dxhat(i);
+
+      b(k) = -fluxo(i,j)*dy(j);
+
+      ## canto inferior direito
+      ## integrais leste e sul se anulam, anulando kmm e kpp
+    elseif (j == 1 && i == eixo_x)	
+      ## fprintf("inf dir \n")
+      
+      A(k,k)   = -(dy(j)/dx(i-1) + dx(i)/dyhat(j));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+
+      ## canto superior direito
+      ## integral norte se anula, leste adiciona termo de fluxo a b(k)
+    elseif (i == eixo_x && j == eixo_y)
+      ## fprintf("sup dir \n")
+      
+      A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      ## A(k,kp)  = 0;
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      ## A(k,kpp) = 0;
+      
+      b(k) = fluxo(i,j)*dy(j);
+      
+    elseif (i == 1 && j == eixo_y)
+      ## fprintf("sup esq \n")
+
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j-1));
+      A(k,km)  = 0;
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      ## A(k,kpp) = 0;
+
+      b(k) = 0;
+
+      ## borda inferior
+      ## integral sul se anula
+    elseif (j == 1)
+      ## fprintf("inf %i %i \n", i, j)
+      
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      ## A(k,kmm) = 0
+      A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+
+      ## borda direita
+      ## checa se há fluxo de saída
+    elseif (i == eixo_x)
+      ## fprintf(" dir \n")
+      ## fprintf(" size of A %i %i \n", i, j);
+      ## size(A)
+      
+      if fluxo(i,j)
+    	A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1) + dx(i)/dyhat(j));
+    	A(k,km)  = dy(j)/dxhat(i-1);
+    	## A(k,kp)  = 0;
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+      
+    	b(k) = fluxo(i,j)*dy(j);
+
+      else
+    	A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1) + dx(i)/dyhat(j));
+    	A(k,km)  = dy(j)/dxhat(i-1);
+    	## A(k,kp)  = 0;
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+      
+    	b(k) = 0;
+      end
+
+      ## fprintf(" size of A\n")
+      ## size(A)
+
+      ## borda norte
+    elseif (j == eixo_y)
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      ## A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+      
+    	## borda esquerda
+    	## checa se há fluxo de entrada
+    elseif (i == 1)
+      ## fprintf("esq \n")
+      
+      if fluxo(i,j)
+    	A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) +  dy(j)/dxhat(i-1));
+    	A(k,km)  = 0;
+    	A(k,kp)  = dy(j)/dxhat(i);
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+
+    	b(k) = -fluxo(i,j)*dy(j);
+      else
+    	A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) +  dy(j)/dxhat(i-1));
+    	A(k,km)  = 0;
+    	A(k,kp)  = dy(j)/dxhat(i);
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+
+    	b(k) = 0;
+      end
+    end
+
+    ## if size(A)(2) > 2400
+    ##   ## fprintf(" size of A %i %j \n", i, j)
+    ##   i
+    ##   j
+    ##   size(A)
+    ## end
+ 
+  end
+end
+
+	## relíquia
+	
+	## elseif (j >= 2)    ## se i+1 é contorno 
+	##   A(k,k)   -= dx(i)/dyhat
+	##   A(k,kmm) += dx(i)/dyhat(j-1)
+
+
+	## if (i >= 2)
+	##   A(k,k)   -= dy(i)/dxhat(i-1)
+	##   A(k,km)  += dy(j)/dxhat(i-1)
+	## else if (y(i+1) <= 2)
+	## 	   b(k) = -fluxo(x) * dy(i)
+	## 	 else
+	## 	   b(k) = 0
+	## 	 end
+	## end
+
+	## if(i <= n-1)
+	##   A(k,k)  -= dy(j)/dxhat(i)
+	##   A(k,kp) += dy(j)/dxhat(i)
+	## else if (y(j) >= 5)
+	## 	   A(k,k) -= 2*dy(j)/dxhat(i)
+	## 	 end
+	## end
+
+
+## Matriz é singular; substitui linha 1000 para retirar singularidade
+## A(1000,:) =  [zeros(1, 1200), 1, zeros(1,1199)]; 
+phi = A\b';
+
+Z = reshape (phi, eixo_x, eixo_y)';
+
+contour(Z,50)

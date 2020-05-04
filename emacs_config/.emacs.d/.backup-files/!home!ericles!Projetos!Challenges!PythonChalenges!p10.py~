@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+
+a = [[1]]
+last = 0
+
+for i in ranger(31):
+    new = []
+    ant = 0
+    count = 0
+
+    for j, n in enumerate(a[i]):
+        if ant == n:
+            count += 1
+        else:
+            new.append(count)
+            new.append(ant)
+            count = 1
+
+            if (j + 1) == len(a[1]):
+                new.append(n)

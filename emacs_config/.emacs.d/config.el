@@ -2,6 +2,9 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (global-prettify-symbols-mode t)
+(add-hook 'racket-mode-hook
+          (lambda ()
+            (push '("lambda" . ?λ) prettify-symbols-alist)))
 
 (add-hook 'text-mode-hook
           (turn-on-auto-fill))
@@ -21,9 +24,9 @@
 (scroll-bar-mode -1)
 
 (setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
+      `((".*" . "~/.emacs.d/.backup-files")))
 (setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
+      `((".*" "~/.emacs.d/.backup-files")))
 
 (global-linum-mode t)
 
@@ -46,6 +49,9 @@
 
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
+
+(use-package transpose-frame
+  :ensure t)
 
 (setq powerline-default-separator nil)
 
@@ -75,6 +81,27 @@
   :ensure t
   :bind ("C-q" . er/expand-region))
 
+(use-package buffer-move
+  :ensure t)
+(global-set-key (kbd "<C-S-up>")     'buf-move-up)
+(global-set-key (kbd "<C-S-down>")   'buf-move-down)
+(global-set-key (kbd "<C-S-left>")   'buf-move-left)
+(global-set-key (kbd "<C-S-right>")  'buf-move-right)
+
+(defun transpose-windows (arg)
+  "Transpose the buffers shown in two windows."
+  (interactive "p")
+  (let ((selector (if (>= arg 0) 'next-window 'previous-window)))
+    (while (/= arg 0)
+      (let ((this-win (window-buffer))
+            (next-win (window-buffer (funcall selector))))
+        (set-window-buffer (selected-window) next-win)
+        (set-window-buffer (funcall selector) this-win)
+        (select-window (funcall selector)))
+      (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
+
+(define-key ctl-x-4-map (kbd "t") 'transpose-windows)
+
 (use-package switch-window
   :ensure t
   :config
@@ -87,6 +114,13 @@
   :bind
     ([remap other-window] . switch-window))
 
+;;  (use-package ivy
+  ;;  :ensure t)
+
+;; (use-package swiper
+;;   :ensure t
+;;   :bind ("C-s" . 'swiper))
+
 (use-package fancy-battery
   :ensure t
   :config
@@ -98,6 +132,21 @@
 
 (add-to-list 'org-structure-template-alist
                '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+
+(add-to-list 'org-structure-template-alist
+               '("sc" "#+BEGIN_SRC scheme\n?\n#+END_SRC"))
+
+(setq geiser-default-implementation 'racket)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((scheme . t)
+   (emacs-lisp . t)
+   (ruby . t)
+   (R . t)
+   (python . t)
+   (C . t)
+   (sh . t)))
 
 ;; (load (expand-file-name "~/.roswell/helper.el"))
 ;; (setq inferior-lisp-program "ros -Q run")
@@ -130,10 +179,42 @@
 
 ;; (setq create-lockfiles nil)
 
-;(setq slime-lisp-implementations
-      ;'((sbcl ("sbcl" "--core" "~/.emacs.d/sbcl.core-for-slime"))))
+;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/slime")
+;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/euslime")
+;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/slime-repl-ansi-color")
+;; (require 'slime-autoloads)
+;; (require 'euslime)
+;; (setq inferior-lisp-program "sbcl")
+;; (setq inferior-euslisp-program "roseus")
+;; (slime-setup '(slime-fancy slime-repl-ansi-color slime-banner))
 
-(global-set-key "\C-cs" 'slime-selector)  ;; Set key binding to slime-selector
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+  ;; Replace "sbcl" with the path to your implementation
+(setq inferior-lisp-program "sbcl")
+
+;; (setq slime-lisp-implementations
+;;       '((sbcl ("sbcl" "--conre" "~/.emacs.d/sbcl.core-for-slime"))))
+
+;; (use-package slime
+;;   :ensure t)
+
+(slime-setup)
+
+(setq slime-startup-animation t)
+
+;; (setq inferior-lisp-program "/usr/local/bin/ccl")
+;; ;;(setq inferior-lisp "/usr/bin/sbcl")
+;; ;;(setq slime-default-lisp "/usr/local/bin/ccl")
+;; ;;(setq slime-lisp-implementations
+;; ;;  '((ccl ("ccl" "-quiet"))
+;; ;;    (sbcl ("/usr/bin/sbcl") :coding-system utf-8-unix))
+
+(add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+
+(setq slime-contribs '(slime-fancy))
+
+;; (global-set-key "\C-cs" 'slime-selector)  ;; Set key binding to slime-selector
 
 (use-package racket-mode
   :ensure t)
@@ -141,7 +222,8 @@
 (use-package paredit
              :ensure t
              :config
-(add-hook 'racket-mode-hook #'enable-paredit-mode))
+(add-hook 'racket-mode-hook #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook #'enable-paredit-mode))
 
 ;; (use-package scheme-smart-complete
 ;;   :ensure t)
@@ -163,46 +245,58 @@
 (setq auto-mode-alist (cons '("\\.pl" . eclipse-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.ecl" . eclipse-mode) auto-mode-alist))
 
+;(use-package ess
+;  :ensure t
+;  :init (require 'ess-site))
+
 (setq auto-mode-alist
       (cons
        '("\\.m$" . octave-mode)
        auto-mode-alist))
+(add-hook 'octave-mode-hook
+    (lambda () (progn (setq octave-comment-char ?%)
+                      (setq comment-start "% ")
+                      (setq comment-add 0))))
 
-(use-package tex-site
-  :ensure auctex
-  :mode ("\\.tex\\'" . latex-mode)
-  :config
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (rainbow-delimiters-mode)
-                (company-mode)
-                (smartparens-mode)
-                (turn-on-reftex)
-                (setq reftex-plug-into-AUCTeX t)
-                (reftex-isearch-minor-mode)
-                (setq TeX-PDF-mode t)
-                (setq TeX-source-correlate-method 'synctex)
-                (setq TeX-source-correlate-start-server t))
-      )
+;; (use-package tex-site
+;;   :ensure auctex
+;;   :mode ("\\.tex\\'" . latex-mode)
+;;   :config
+;;   (setq TeX-auto-save t)
+;;   (setq TeX-parse-self t)
+;;   (setq-default TeX-master nil)
+;;   (add-hook 'LaTeX-mode-hook
+;;               (lambda ()
+;;                 (rainbow-delimiters-mode)
+;;                 (company-mode)
+;;                 (smartparens-mode)
+;;                 (turn-on-reftex)
+;;                 (setq reftex-plug-into-AUCTeX t)
+;;                 (reftex-isearch-minor-mode)
+;;                 (setq TeX-PDF-mode t)
+;;                 (setq TeX-source-correlate-method 'synctex)
+;;                 (setq TeX-source-correlate-start-server t)))
 
-  ;; Update PDF buffers after successful LaTeX runs
-  (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-              #'TeX-revert-document-buffer)
+;;   ;; Update PDF buffers after successful LaTeX runs
+;;   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+;;               #'TeX-revert-document-buffer)
 
-  ;; to use pdfview with auctex
-  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+;;   ;; to use pdfview with auctex
+;;   (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
 
-  ;; to use pdfview with auctex
-  (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
-          TeX-source-correlate-start-server t)
-  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
- )
+;;   ;; to use pdfview with auctex
+;;   (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+;;           TeX-source-correlate-start-server t)
+;;   (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
 
 ;; (use-package auctex
 ;;   :ensure t)
+
+(use-package tex
+  :defer t
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t))
 
 (setq org-src-window-setup 'current-window)
 
@@ -260,9 +354,12 @@
   (setq magit-push-always-verify nil)
   (setq git-commit-summary-max-length 50)
   :bind
-  ("M-g" . magit-status))
+  ("M-t" . magit-status))
 
 (global-set-key (kbd "C-x b") 'ibuffer)
+
+(use-package haml-mode
+  :ensure t)
 
 (defun config-visit ()
   (interactive)

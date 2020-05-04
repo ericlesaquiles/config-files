@@ -1,0 +1,56 @@
+$!/usr/bin/env python
+
+def create_board():
+    return np.zeros(shape = (3,3))
+
+def place(board, player, position):
+    if board[position] == 0:
+        board[position] = player
+        return board
+
+def possibilities(board):
+    pos = np.where(board == 0)
+    pos = list(zip(pos[0],pos[1]))
+    return pos
+
+def random_place(board, player):
+    available = possibilities(board)
+    choice = random.choice(available)
+    board = place(board, player, choice)
+    return board
+
+def row_win(board, player):
+    for row in board:
+        if np.prod(row) == player**3:
+            return True
+    return False
+
+def col_win(board, player):
+    return row_win(board.T, player)
+
+def diag_win(board, player):
+    if board[1,1] == board[2,2] == board[0,0] == player:
+        return True
+    elif board[1,1] == board[2,0] == board[0,2] == player:
+        return True
+
+def evaluate(board):
+    winner = 0
+    for player in [1, 2]:
+        win = diag_win(board, player) or row_win(board, player) or col_win(board, player)
+        if win:
+            winner = player
+
+    if np.all(board != 0) and winner == 0:
+        winner = -1
+    return winner
+
+def play_game():
+    board = create_board()
+    for player in [1, 2]:
+        random_place(board, player)
+        print(board)
+        winner = evaluate(board) 
+        print(winner)
+        if winner in [-1,1,2]:
+            return winner

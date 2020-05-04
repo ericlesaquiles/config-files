@@ -1,10 +1,10 @@
 ;;; switch-window-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "switch-window" "switch-window.el" (23648 46538
-;;;;;;  309133 188000))
+;;;### (autoloads nil "switch-window" "switch-window.el" (23685 37156
+;;;;;;  621630 230000))
 ;;; Generated autoloads from switch-window.el
 
 (autoload 'switch-window-then-delete "switch-window" "\
@@ -100,7 +100,7 @@ Designed to replace `compose-mail-other-window'.
 ;;;***
 
 ;;;### (autoloads nil nil ("switch-window-asciiart.el" "switch-window-mvborder.el"
-;;;;;;  "switch-window-pkg.el") (23648 46538 335562 605000))
+;;;;;;  "switch-window-pkg.el") (23685 37156 633630 561000))
 
 ;;;***
 

@@ -1,10 +1,10 @@
 ;;; sudo-edit-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "sudo-edit" "sudo-edit.el" (23428 19681 124718
-;;;;;;  140000))
+;;;### (autoloads nil "sudo-edit" "sudo-edit.el" (23685 37152 1502
+;;;;;;  766000))
 ;;; Generated autoloads from sudo-edit.el
 
 (autoload 'sudo-edit-set-header "sudo-edit" "\
@@ -15,7 +15,8 @@ This function is suitable to add to `find-file-hook' and `dired-file-hook'.
 
 (defvar sudo-edit-indicator-mode nil "\
 Non-nil if Sudo-Edit-Indicator mode is enabled.
-See the command `sudo-edit-indicator-mode' for a description of this minor mode.
+See the `sudo-edit-indicator-mode' command
+for a description of this minor mode.
 Setting this variable directly does not take effect;
 either customize it (see the info node `Easy Customization')
 or call the function `sudo-edit-indicator-mode'.")

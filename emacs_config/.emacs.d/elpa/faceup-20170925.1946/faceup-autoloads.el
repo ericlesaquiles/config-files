@@ -1,9 +1,9 @@
 ;;; faceup-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "faceup" "faceup.el" (23639 26333 371607 226000))
+;;;### (autoloads nil "faceup" "faceup.el" (23685 37170 846021 397000))
 ;;; Generated autoloads from faceup.el
 
 (autoload 'faceup-view-buffer "faceup" "\

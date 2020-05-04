@@ -1,0 +1,67 @@
+
+## defina a função fluxo(x)
+
+
+for i=1:m
+  for j=1:n
+    k = 1 + (j-1)*n
+    kp = (i + 1) + (j - 1)*m
+    km = (i - 1) + (j - 1)*m
+    kpp = i + ((j + 1) - 1)*m
+    kmm = i + ((j - 1) - 1)*m
+
+    ## 5 casos			
+    ## Precisa definir A(k,k), A(k,kp,) A(k,km), A(k,kpp), A(k,kmm), b(k)
+
+    ## sem condição de contorno
+    if (i >= 2 & j >= 2 & i <= m-1 & j<= n-1)
+      A(k,k)   = -(dy(i)/dxhat(i) + dxi/dyhat(i) + dx(i)/dyhat(j-1) + dy(i)/dxhat(i-1))
+      A(k,km)  = dy(j)/dxhat(i-1)
+      A(k,kp)  = dy(j)/dxhat(i)
+      A(k,kmm) = dx(i)/dyhat(j-1)
+      A(k,kpp) = dx(i)/dyhat(j)
+
+      b(k) = 0
+    end
+
+    ## Contorno inferior
+    if (j == 1)
+      A(k,k)   = -(dy(i)/dxhat(i) + dxi/dyhat(i) + dy(i)/dxhat(i-1))
+      A(k,km)  = dy(j)/dxhat(i-1)
+      A(k,kp)  = dy(j)/dxhat(i)
+      A(k,kmm) = 0
+      A(k,kpp) = dx(i)/dyhat(j)
+
+      b(k) = 0
+    end
+
+
+
+    ## se i+1 é contorno
+    if (j >= 2)
+      A(k,k)   -= dx(i)/dyhat
+      A(k,kmm) += dx(i)/dyhat(j-1)
+    end
+
+    if (j <= n - 1)
+      A(k,k)   -= dx(i)/dyhat(j)
+      A(k,kpp) += dx(i)/dyhat(j)
+    end
+
+    if (i >= 2)
+      A(k,k)   -= dy(i)/dxhat(i-1)
+      A(k,km)  += dy(j)/dxhat(i-1)
+    else if (y(i+1) <= 2)
+	   b(k) = -fluxo(x) dy(i)
+	 else
+	   b(k) = 0
+	 end
+    end
+
+    if(i <= n-1)
+      A(k,k)  -= dy(j)/dxhat(i)
+      A(k,kp) += dy(j)/dxhat(i)
+    else if (y(j) >= 5)
+	   A(k,k) -= 2*dy(j)/dxhat(i)
+	 end
+    end

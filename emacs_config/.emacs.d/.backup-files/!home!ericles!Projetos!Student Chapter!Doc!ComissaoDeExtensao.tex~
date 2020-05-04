@@ -1,0 +1,103 @@
+\documentclass{article}
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{yfonts}
+\usepackage{amsfonts}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{float}
+
+\setlength{\parskip}{10pt plus 1pt minus 1pt}
+
+
+
+\begin{document}
+
+
+\begin{titlepage}
+  \begin{center}
+    \vspace*{\fill}
+    \begin{LARGE}
+      Proposta de criação de grupo de extensão SIAM Student Chapter\\[1.5cm]
+    \end{LARGE}
+    \vspace*{\fill}
+    \vfill
+    \begin{normalsize}
+      ICMC - USP\\
+      São Carlos, 01/11/2017
+    \end{normalsize}
+  \end{center}
+\end{titlepage}
+
+
+
+
+
+\title{\text{Novos centros de distribuição}}
+\author{Ericles Antonio Aquiles Barbosa Lima - 9790687}
+
+\section{Introdução}
+
+O \textit{Student Chapter} é um grupo extracurricular ligado a SIAM (\textit{Society for Industrial and Applied Mathematics}) com o propósito facilitar o acesso, estudo, compreensão, vivência e apreciação da matemática aplicada e áreas correlatas. O grupo foi formalizado junto à SIAM em 2015 e tem lentamente se desenvolvido desde então. Atualmente, que seja de nosso conhecimento, não existem outros grupos extracurriculares ligados à matemática ou
+matemática aplicada, e o \textit{Student Chapter} preenche, assim, uma carência nesse sentido.
+
+O grupo idealmente envolve alunos e professores de áreas diferentes, tais como de matemática pura, matemática aplicada, estatística, computação, engenharia, física, entre outros. Suas atividades podem incluir discussões sobre oportunidades de carreira nas áreas chave (isto é, matemática aplicada e computação científica), palestras realizadas por convidados, seminários, competições, projetos sociais e viagens de campo a centros de pesquisa ou encontros relacionados a área.
+
+\section{Do Chapter}
+
+O \textit{Student Chapter} é ligado à SIAM. Isto significa que os membros do grupo podem eventualmente desfrutar de algumas facilidades oferecidas, tais como:
+
+\begin{itemize}
+  \item Se tornar gratuitamente um membro da SIAM;
+  \item Receber discontos em itens (como livros e artigos) vendidos pela SIAM;
+  \item Receber ajudas de custo para a eventual participação em eventos ligados à SIAM.
+\end{itemize}
+
+Além disso, o grupo, a princípio\footnote{É a princípio porque ainda não recebemos este semestre.}, recebe da SIAM uma ajuda semestral de 500 dólares americanos, para arcar com eventuais custos de funcionamento.
+
+A cada fim de semestre, o grupo envia à SIAM um relatório constando a utilização do referido dinheiro, completo com notas fiscais. Se esses 500 dólares não são completamente utilizados em um semestre, no semestre seguinte eles enviam o valor da diferença entre os 500 dólares e a quantia não usada (e nunca temos em conta mais do que o equivalente a 500 dólares provenientes da SIAM).
+
+Essa ajuda semestral pode ser usada, entre outras coisas, para arcar com:
+\begin{itemize}
+  \item \textit{Coffee breaks}, ou compra de lanches, para eventos;
+  \item Veículos para transporte;
+  \item Ajuda de custo para o convite de palestrantes;
+  \item Realização de eventos.
+\end{itemize}
+
+Mas não pode ser usado para propósitos de premiação. Caso esse dinheiro não seja o suficiente para a realização de alguma aividade, podemos buscar patrocínios de maneiras diversas.
+
+\section{Atividades Desenvolvidas}
+
+Além de dinâmicas internas, direcionadas para favorecer uma maior coesão do grupo, algumas atividades que já foram desenvolvidas são:
+
+\begin{itemize}
+  \item Viagens de campo a centros de pesquisa;
+  \item Convite de pesquisadores de centro de pesquisa para palestra;
+  \item Realização de seminários sobre temas diversos.
+\end{itemize}
+
+E atividades que estamos organizando e pretendemos empreender são:
+
+\begin{itemize}
+  \item Círculos matemáticos\footnote{Resumidamente, a discussão de problemas e teorias matemáticas com um formato diferente do que se vê na escola.} com jovens de baixa renda;
+  \item Competição de soluções matemáticas para problemas reais;
+\end{itemize}
+
+Além disso, estamos buscando melhorar os processos internos do grupo e criar um site e uma logomarca para melhorar a divulgação de nossos projetos.
+
+Gostaríamos de desenvolver mais atividades, mas estamos em um processo de reestruturação interna e, dados que vários antigos membros acabaram de deixar o grupo, com uma quantidade de membros proibitíva.
+
+\section{Processos}
+
+Atualmente, o professor coordenador do grupo é José Alberto (o Potí) e, na posição de coordenadora do curso de Matemática Aplicada e Computação Científica, a Marina Andretta.
+
+O atual presidente do grupo, que lida com a SIAM é o aluno do curso de Matemática Aplicada e Computação Científica, Éricles Lima. Além dele, o grupo conta, atualmente, com os seguintes membros:
+
+\begin{itemize}
+  \item Mônica Colacique, cursando Sistemas da Informação;
+  \item Carlos Martins,   cursando Sistemas da Informação;
+  \item Letícia Burla,    cursando Matemática Aplicada e Computação Científica.
+\end{itemize}
+
+\end{document}

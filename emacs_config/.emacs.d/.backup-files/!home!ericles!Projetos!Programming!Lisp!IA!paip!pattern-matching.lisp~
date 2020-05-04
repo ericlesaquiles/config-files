@@ -1,0 +1,326 @@
+(defun variable-p (x)
+     "Is x a variable (something beginning with '?')?"
+     (and (symbolp x) (equal (char (symbol-name x) 0) #\?)))
+
+(defconstant fail nil "Indicates pat-match failure")
+(defparameter no-bindings '((t . t)) "Indicates pat-success with no variables")
+
+(defun starts-with (l a)
+  (and (consp l) (eql (first l) a)))
+
+(defun get-binding (var bindings)
+  "Find a (variable . value) pair in a binding list."
+  (assoc var bindings))
+
+
+(defun make-binding (var val) (cons var val))
+
+(defun get-binding (var bindings)
+  "Find a (variable . value) pair in a binding list."
+  (assoc var bindings))
+
+(defun binding-var (binding)
+  "Get the variable part of a single binding."
+  (car binding))
+
+(defun binding-val (binding)
+  "Get the value part of a single binding."
+  (cdr binding))
+
+(defun lookup (var bindings)
+  "Get the value part (for var) from a binding list."
+  (binding-val (get-binding var bindings)))
+
+(defun extend-bindings (var val bindings)
+  "Add a (var. value) pair to a binding list."
+  (cons (cons var val)
+	;; Gets rid of dummy no-bindings (t . t)
+	(if (eq bindings no-bindings)
+	    fail
+	    bindings)))
+
+
+;; (defun pat-match2 (pattern input)
+;;   (if (variable-p pattern)
+;;       (list (cons pattern input))
+;;       (if (or (atom pattern) (atom input))
+;; 	  (eql pattern input)
+;; 	  (append (pat-match2 (first pattern) (first input))
+;; 		  (pat-match2 (rest pattern) (rest input))))))a
+
+
+;; (defun pat-match3 (pattern input &optional (bindings no-bindings))
+;;   (cond ((eq bindings fail) fail)
+;; 	((variable-p pattern)
+;; 	 (match-variable pattern input bindings))
+;; 	((eql pattern input)bindings)
+;; 	((and (consp pattern) (consp input))
+;; 	 (pat-match3 (rest pattern) (rest input)
+;; 		     (pat-match3 (first pattern) (first input)
+;; 				 bindings)))))
+
+(defun pat-match (pattern input &optional (bindings no-bindings))
+  "Match pattern against input in the context of the bindings"
+  (cond ((eq bindings fail) fail)
+	((variable-p pattern)
+	 (match-variable pattern input bindings))
+	((eql pattern input) bindings)
+	((segment-pattern-p pattern)
+	 (segment-match pattern input bindings))
+	((single-pattern-p pattern)		  ;***
+	 (single-matcher pattern input bindings)) ;***
+	((and (consp pattern) (consp input))
+	 (pat-match (rest pattern) (rest input)
+		    (pat-match (first pattern) (first input)
+			       bindings)))
+	(t fail)))
+
+(defun match-variable (var input bindings)
+  "Does var match input? Uses or updates and returns bindings."
+  (let ((binding (get-binding var bindings)))
+    (cond ((not binding) (extend-bindings var input bindings))
+	  ((equal input (binding-val binding)) bindings)
+	  (t fail))))
+
+
+
+					; ****************
+
+
+(setf (get '?is  'single-match) 'match-is)
+(setf (get '?or  'single-match) 'match-or)
+(setf (get '?and 'single-match) 'match-and)
+(setf (get '?not 'single-match) 'match-not)
+
+(setf (get '?*  'segment-match) 'segment-match)
+(setf (get '?+  'segment-match) 'segment-match+)
+(setf (get '??  'segment-match) 'segment-match?)
+(setf (get '?if 'segment-match) 'match-if)
+
+(defun segment-pattern-p (pattern)
+  "Is this a segment-matching pattern like ((?* var) . pat)?"
+  (and (consp pattern) (consp (first pattern))
+       (symbolp (first (first pattern)))
+       (segment-match-fn (first (first pattern)))))
+
+(defun single-pattern-p (pattern)
+  "Is this a single-matching patter?
+   E.g. (?is x predicate) (?and . patterns) (?or . patterns)."
+  (and (consp pattern)
+       (single-match-fn (first pattern))))
+
+; ****************
+
+(defun segment-matcher (pattern input bindings)
+  "Calls the right function for this kind of segment pattern."
+  (funcall (segment-match-fn (first (first pattern)))
+	   pattern input bindings))
+
+(defun single-matcher (pattern input bindings)
+  "Calls the right function for this kind of single pattern."
+  (funcall (single-match-fn (first pattern))
+	   (rest pattern) input bindings))
+
+(defun segment-match-fn (x)
+  "Get the segment-match function for x,
+   if it is a symbol that has one."
+  (when (symbolp x) (get x 'segment-match)))
+
+(defun single-match-fn (x)
+  "Get the single=match function for x,
+   if it is a symbol that has one."
+  (when (symbolp x) (get x 'single-match)))
+
+
+; ***************
+
+(defun first-match-pos (pat1 input start)
+  "Find the first position that pat1 could possibly match input,
+   starting at position start. If pat1 is non-constant, then just 
+   return start."
+  (cond ((and (atom pat1) (not (variable-p pat1)))
+	 (position pat1 input :start start :test #'equal))
+	((< start (length input)) start)
+	(t nil)))
+
+(defun segment-match (pattern input bindings &optional (start 0))
+  "Match the segment pattern ((?* var) . pat) against input."
+  (let ((var (second (first pattern)))
+	(pat (rest pattern)))
+    (if (null pat)
+	(match-variable var input bindings)
+	(let ((pos (first-match-pos (first pat) input start)))
+	  (if (null pos)
+	      fail
+	      (let ((b2 (pat-match pat (subseq input pos)
+			 (match-variable var (subseq input 0 pos);bug
+					 bindings))))
+		;; If this match failed, try another one
+		(if (eq b2 fail)
+		    (segment-match pattern input bindings (1+ pos))
+		    b2)))))))
+
+(defun match-is (var-and-pred input bindings)
+  "Succeed and bind var if the input satisfies pred,
+   where var-and-pred is the list (var pred)."
+  (let* ((var (first var-and-pred))
+	 (pred (second var-and-pred))
+	 (new-bindings (pat-match var input bindings)))
+    (if (or (eq new-bindings fail)
+	    (not (funcall pred input)))
+	fail
+	new-bindings)))
+
+(defun match-and (patterns input bindings)
+  "Succeed if all the patterns match the input."
+  (cond ((eq bindings fail) fail)
+	((null patterns) bindings)
+	(t (match-and (rest patterns) input
+		      (pat-match (first patterns) input
+				 bindings)))))
+
+(defun match-or (patterns input bindings)
+  "Succeed if none of the patterns match the input.
+   This will never bind any variables."
+  (if (match-or patterns input bindings)
+      fail
+      bindings))
+
+(defun segment-match+ (pattern input bindings)
+  "Match one or more elements of input."
+  (segment-match pattern input bindings 1))
+
+(defun segment-match? (pattern input bindings)
+  "Match zero or one element of input."
+  (let ((var (second (first pattern)))
+	(pat (rest pattern)))
+    (or (pat-match (cons var pat) input bindings)
+	(pat-match pat input bindings))))
+
+(defun match-if (pattern input bindings)
+  "Test an expression like ((?if code) . rest)  involving variables."
+  (and (progv (mapcar #'car bindings)
+	   (mapcar #'cdr bindings)
+	 (eval (second (first pattern))))
+       (pat-match (rest pattern) input bindings)))
+
+
+
+;;; ELIZA
+(defun rule-pattern (rule) (first rule))
+(defun rule-responses (rule) (rest rule))
+
+
+
+
+(defparameter *eliza-rules*
+  '((((?* ?x) hello (?* ?y))
+     (How do you do. Please state your problem))
+    (((?* ?x) I want (?* ?y))
+     (What would it mean if you got ?y ?)
+     (Why do you want ?y ?)
+     (Suppose you got ?y soon))
+    (((?* ?x) if (?* ?y))
+     (Doyou think it is likely that ?y)
+     (Do you wish that ?y)
+     (What do you think about ?y)
+     (Really-- if ?y))
+    (((?* ?x) no (?* ?y))
+     (Why not?)
+     (You are being a bit negative)
+     (Are you saying "NO" just to be negative?))
+    (((?* ?x) I was (?* ?y))
+     (Were you really?)
+     (Perhaps I already knew you were ?y)
+     (Why do you tell me you were ?y now?))
+    ((
+      (?* ?x I feel (?* ?y))) ; ** er..
+     (Do you often feel ?y))
+    (((?* ?x) I felt (?* ?y))
+     (What other feelings do you have))))
+
+(defun eliza ()
+  "Respond to user input using patter matching rules"
+  (loop
+     (print 'eliza>)
+     (write (flatten (use-eliza-rules (read))) :pretty t)))
+
+(defun use-eliza-rules (input)
+  "Find some rule with which to transform the input"
+  (some #'(lambda (rule)
+	    (let ((result (pat-match (rule-pattern rule) input)))
+	      (if (not (eq result fail))
+		  (sublis (switch-viewpoint result)
+			  (random-elt (rule-responses rule))))))
+	*eliza-rules*))
+
+(defun switch-viewpoint (words)
+  "Change I to you and vice versa, and so on"
+  (sublis '((I . you) (you . I) (me . you) (am . are))
+	  words))
+
+(defun random-elt (list)
+  (elt list (random (length list))))
+
+(defun mklist (x)
+  (if (listp x)
+      x
+      (list x)))
+
+(defun flatten (list)
+  (mappend #'mklist list))
+
+(defun mappend (fn list)
+  (apply #'append (mapcar fn list)))
+
+;;; Allow ?x* abbreviation
+
+(defun pat-match-abbrev (symbol expansion)
+  (setf (get symbol 'expand-pat-match-abbrev)
+	(expand-pat-match-abbrev expansion)))
+
+(defun expand-pat-match-abbrev (pat)
+  (cond
+    ((and (symbolp pat) (get pat 'expand-pat-match-abbrev)))
+    ((atom pat) pat)
+    (t (cons (expand-pat-match-abbrev (first pat))
+	     (expand-pat-match-abbrev (rest pat))))))
+
+(defun reckon-var (symbol)
+  (let* ((s-name (symbol-name symbol))
+	 (s-length (length s-name)))
+    (and (> s-length 2)
+	 (eql (char s-name 0) #\?)
+	 (eql (char s-name (1- s-length)) #\*))))
+
+(defun trans-var (var)
+  (let* ((s-name (string var))
+	 (s-length (length s-name)))
+    (unless (get var 'expand-pat-match-abbrev)
+	(pat-match-abbrev var `(?* ,(read-from-string (subseq s-name 0 (1- s-length))))))
+    (expand-pat-match-abbrev var)))
+
+(defun take-var-symbols (pattern)
+  (cond
+    ((null pattern) '())
+    ((consp (first pattern))
+     (cons (take-var-symbols (first pattern))
+	   (rest pattern)))
+    ((reckon-var (first pattern))
+     (cons (trans-var (first pattern))
+	   (take-var-symbols (rest pattern))))
+    (t (cons (car pattern)
+	     (take-var-symbols (rest pattern))))))
+
+;;;
+
+(defun rule-based-translator
+    (input rules &key (matcher #'pat-match)
+		   (rule-if #'first) (rule-then #'rest) (action #'sublis))
+  "Finds first rule in rules that matches input and apply the action to it."
+  (some
+   #'(lambda (rule)
+       (let ((result (funcall matcher (funcall rule-if rule) input)))
+	 (if (not (eq result fail))
+	     (funcall action result (funcall rule-then rule)))))
+   rules))

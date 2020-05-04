@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+
+fnm = 'pi2f.txt'
+f = open(fnm)
+
+tring = f.readlines()
+str = ''.join(tring)
+
+ls = []
+
+for c in str:
+    if c.isalpha():
+        ls.append(c)
+
+print(c)

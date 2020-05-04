@@ -1,10 +1,10 @@
 ;;; paredit-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "paredit" "paredit.el" (23639 26335 926834
-;;;;;;  938000))
+;;;### (autoloads nil "paredit" "paredit.el" (23685 37175 350144
+;;;;;;  865000))
 ;;; Generated autoloads from paredit.el
 
 (autoload 'paredit-mode "paredit" "\

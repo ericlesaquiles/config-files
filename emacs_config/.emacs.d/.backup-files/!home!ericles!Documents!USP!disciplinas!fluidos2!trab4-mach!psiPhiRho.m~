@@ -1,0 +1,143 @@
+pkg load symbolic;
+
+eixo_x  = 60;
+eixo_y  = 40;
+
+h = 2;
+l = 3;
+
+del = .1;
+
+dy = @(i) h/eixo_y;
+dx = @(i) l/eixo_x;
+dyhat = @(i) h/eixo_y;
+dxhat = @(i) l/eixo_x;
+
+posy = @(j) j * (h)/eixo_y;
+posx = @(i) i * (l)/eixo_x;
+
+har = @(a,b) 1/(1/a + 1/b);	# harmonic mean of a and b
+obstacleList = [];		# each obstacle is a list of vertices of the form [[x y] [x y]]
+
+Phi = sym('Phi', [eixo_y eixo_x]); # TODO CHECK
+
+## Checks for borders
+atWestContainerBorder   = @(i,j) i == 1 && posy(j) > 1 && posy(j) < 2;
+atSouthContainerBorder  = @(i,j) posy(j) == 1 || posy(j) == dy(j);
+atEastContainerBorder   = @(i,j) i = eixo_x;
+atNorthContainerBorder  = @(i,j) j = eixo_y;
+aw = atWestContainerBorder; as = atSouthContainerBorder; # shorteners
+ae = atEastContainerBorder; an = atEastContainerBorder;	 #
+
+## Geometric border functions
+isIn = @(i, j) ...
+	((i > 1) && (j > 1) && (j < eixo_y) && (i < eixo_x)) ...
+       && (posy(j) > 1 ...
+	   || ((posx(i) > 1) && (posy(j) > 2 - posx(i)))) ;
+
+isOut = @(i,j) ((posy(j) < 1) && (posx(i) < 1)) || ((posx(i) >= 1) && (posy(j) < 2 - posx(i)));
+
+
+## Flux function
+function fl = flu (i, j, posy, posx, eixo_x)
+  if i == 1 && posy(j) >= 1 && posy(j) <= 2
+    fl = 10;
+  elseif i == eixo_x
+    fl = 5;
+  end  
+endfunction
+fluxo = @(i,j) flu(i,j,posy,posx, eixo_x);
+
+
+## Finite differences functions
+Dfx = @(xi, yi, delta, f) (f(xi + 1, yi) - f(xi, yi))/vpa(delta);
+Dfy = @(xi, yi, delta, f) (f(xi, yi + 1) - f(xi, yi))/vpa(delta);
+Dcx = @(xi, yi, delta, f) (f(xi + 1, yi) - f(xi - 1, yi))/vpa((2*delta));
+Dcy = @(xi, yi, delta, f) (f(xi, yi + 1) - f(xi, yi + 1))/vpa((2*delta));
+Dbx = @(xi, yi, delta, f) (f(xi, yi) - f(xi - 1, yi))/vpa(delta);
+Dby = @(xi, yi, delta, f) (f(xi, yi) - f(xi - 1, yi))/vpa(delta);
+
+
+## 
+function dxij = dxphi (i, j, del, phi, isIn, isOut, Dcx, fluxo, aw, as, ae, an)
+  if isIn(i,j)
+    dxij = Dcx(i,j,del,phi);
+  elseif aw(i,j) || ae(i,j)
+    dxij = fluxo(i,j);
+  elseif as(i,j) || an(i,j)
+    dxij = 0;
+  else
+    dxij = 0;
+  end
+end
+
+function dyij = dyphi (i, j, del, phi, isIn, Dcy, fluxo, au, as, ae, an)
+  if isIn(i,j)
+    dyij = Dcy(i,j,del,Phi);
+  elseif as(i,j)
+    dyij = Dfy(i,j,del,Phi);
+  elseif an(i,j)
+    dyij = Dby(i,j,del,Phi);
+  elseif aw(i,j) || ae(i,j)
+    dyij = Dcy(i,j,del,Phi);
+  else
+    dyij = 0;
+  end
+end
+
+DxPhi = @(i,j) dxphi(i,j, dx(i), Phi, isIn, Dcx, fluxo, aw, as, ae, an); #
+DyPhi = @(i,j) dyphi(i,j, dy(j), Phi, isIn, Dcy, fluxo, aw, as, ae, an); #
+
+
+## Defining Rho
+a   = 4;
+Ma2 = @(i,j) (DxPhi(i,j)^2 + DyPhi(i,j)^2)/a^2;
+rho = @(i,j) (1 + Ma2(i,j)/5)^(-5/2);
+
+## Integrate the faces
+
+function bord = Intgr (i, j, isIn, dx, dy, har, rho, Phi, DxPhi, DyPhi, dxphi, dyphi, aw, as, ae, an)
+  if isIn(i,j)			# if in the interior
+    ## South integral
+    bord = 2*(dx(i)/dy(j)) * har(rho(i,j), rho(i,j-1)) *  (Phi(i,j-1) - Phi(i,j));
+    ## East integral
+    bord += 2*(dy(j)/dx(i)) * har(rho(i,j), rho(i+1,j)) * (Phi(i+1,j) - Phi(i,j));
+    ## North integral
+    bord += 2*(dy(j)/dx(i)) * har(rho(i,j), rho(i,j+1)) * (Phi(i,j+1) - Phi(i,j));
+    ## West integral
+    bord += 2*(dy(j)/dx(i)) * har(rho(i,j), rho(i+1,j)) * (Phi(i+1,j) - Phi(i,j));
+  elseif !isOut(i,j)
+      if aw(i,j)
+	## DxPhi = fluxo(i,j);       <- this is dealt with in the D function
+	bord = 2*(dy(j)) * har(rho(i,j), rho(i+1,j)) * fluxo(i,j);
+      else
+	bord = 2*(dx(i)/dy(j)) * har(rho(i,j), rho(i,j-1)) *  (Phi(i,j-1) - Phi(i,j));
+      end
+      if !as(i,j)
+	bord += 2*(dx(i)/dy(j)) * har(rho(i,j), rho(i,j-1)) *  (Phi(i,j-1) - Phi(i,j));
+      end
+      if ae(i,j) 
+	bord += 2*dy(j) * har(rho(i,j), rho(i+1,j)) * fluxo(i,j);
+      else
+	bord += 2*(dy(j)/dx(i)) * har(rho(i,j), rho(i+1,j)) * (Phi(i+1,j) - Phi(i,j));
+      end
+      if !an(i,j)
+	bord += 2*(dy(j)/dx(i)) * har(rho(i,j), rho(i,j+1)) * (Phi(i,j+1) - Phi(i,j));
+      end
+  else
+    bord = Phi(i,j);
+  end  
+endfunction
+Integra = @(i,j) Intgr(i,j,isOut,isIn,dx,dy,har,rho,Phi,DxPhi,DyPhi,dxphi,dyphi,aw,as,ae,an);
+                   ## (i,j,isOut,isIn,dx,dy,har,rho,Phi,DxPhi,DyPhi,dxphi,dyphi, aw, as, ae, an)
+
+G = zeros(eixo_y, eixo_x);
+for i = 1:eixo_x
+  for j = 1:eixo_y
+    ## Integra(i, j);
+    ## DxPhi(i,j)
+
+    ## Intgr(i,j,isOut,isIn,dx,dy,har,rho,Phi,DxPhi,DyPhi,dxphi,dyphi,aw,as,ae,an);
+    G(i,j) = Integra(i, j);
+  end
+end

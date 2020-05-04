@@ -1,17 +1,41 @@
 
 ;; ----- smex-history -----
 (
- mechanics
- run-scheme
- cd
- 5x5
- arp
- dbx
- dig
+ slime
+ slitex-mode
+ run-octave
+ query-replace
+ revert-buffer
+ transpose-windows
+ describe-variable
 )
 
 ;; ----- smex-data -----
 (
  (run-scheme . 4)
  (mechanics . 6)
+ (racket-send-region . 2)
+ (eval-buffer . 2)
+ (slime . 25)
+ (octave-send-block . 15)
+ (octave-send-region . 74)
+ (query-replace . 38)
+ (octave-send-buffer . 80)
+ (slime-disconnect-all . 1)
+ (package-install-selected-packages . 1)
+ (buf-move-right . 2)
+ (buf-move-up . 1)
+ (org-latex-export-to-pdf . 17)
+ (transpose-windows . 10)
+ (revert-buffer . 3)
+ (oz-feed-file . 1)
+ (comint-kill-region . 1)
+ (mouse-major-mode-menu . 2)
+ (describe-variable . 5)
+ (slime-inspector-next . 1)
+ (toggle-text-mode-auto-fill . 1)
+ (euslime . 3)
+ (run-octave . 10)
+ (octave-kill-process . 1)
+ (slitex-mode . 1)
 )

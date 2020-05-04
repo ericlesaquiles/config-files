@@ -1,0 +1,46 @@
+#!/usr/bin/python3
+fnm = "pi3.txt"
+f = open(fnm)
+
+tring = f.readlines()
+str = ''.join(tring)
+
+# count = 0
+# frstbd = 0
+# scndbd = 0
+# space = 0
+# ch = ''
+
+# ls = []
+
+# for c in str:
+#     if c.isupper():
+#         space = 0
+#         count += 1
+#         if count > 3:
+#             frstbd = 0
+#             scndbd = 0
+
+#     else:
+#         if count == 3:
+#             if frstbd:
+#                 ls.append(ch)
+#                 frstbd = 0
+#                 scndbd = 0
+#             else:
+#                 frstbd = 1
+#                 ch = c
+#                 space += 1
+#         count = 0
+
+#     if space > 1:
+#         frstbd = 0
+#         scndbd = 0
+
+
+# print(''.join(ls))
+
+
+pattern = "[a-z][A-Z]{3}[a-z][A-Z]{3}[a-z]"
+result = re.findall(pattern, str)
+print(result)

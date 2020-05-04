@@ -1,0 +1,9 @@
+function DF = diffForce(pol, theta, dy, dt)
+  v1 = [0; 1];
+  Md = repmat(v1, 1, columns(pol));
+
+  ##      centralDifferences(f,       arg,              darg,           d)
+  DF(1) = centralDifferences(@Wforce, [pol [theta; 0]], [Md*dy [0; 0]], dy);
+  DF(2) = centralDifferences(@Wforce, [pol [theta; 0]], [zeros(2,columns(pol))  [theta*dt; 0]], dt);
+  ## DF(2) = centralDifferences(@force, [pol [theta; 0]], [zeros(rows(pol,columns(pol) [-dt; 0]]);
+end

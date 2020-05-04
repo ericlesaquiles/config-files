@@ -1,0 +1,11 @@
+import urllib.request
+import re
+
+file = ".txt"
+n   = "90052"
+pattern = "[0-9]+"
+
+for i in range(400):
+     content =  open(n + file)
+     n = re.findall(pattern, content.decode('utf-8'))[0]
+     print(content)

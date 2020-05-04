@@ -40,10 +40,20 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(inhibit-startup-screen t))
+ '(inhibit-startup-screen t)
+ '(package-selected-packages
+   (quote
+    (transpose-frame haml-mode ess buffer-move rotate-window slime swiper ivy true magit which-key use-package switch-window sudo-edit smex racket-mode paredit org-bullets ido-vertical-mode hungry-delete geiser fancy-battery expand-region beacon avy auctex)))
+ '(safe-local-variable-values
+   (quote
+    ((Syntax . Common-Lisp)
+     (whitespace-style quote
+		       (face trailing empty tabs))
+     (whitespace-action)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'narrow-to-region 'disabled nil)

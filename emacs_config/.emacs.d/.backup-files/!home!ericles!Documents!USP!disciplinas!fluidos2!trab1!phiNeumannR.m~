@@ -1,0 +1,67 @@
+
+h = 4;
+l = 6;
+
+eixo_x = 120;				# linhas
+eixo_y = 80;				# colunas
+
+dy = @(i) h/eixo_y;
+dx = @(i) l/eixo_x;
+dyhat = @(i) h/eixo_y;
+dxhat = @(i) l/eixo_x;
+
+## fluxo(i,j) retorna o fluxo na posição (i,j) da malh
+fluxo = @(i,j) (((i == 1) && (j < eixo_y/h)) || ((i == eixo_x) && (j >  3*(eixo_y/h)))) * 5;
+
+A = sparse(zeros(eixo_x*eixo_y,eixo_x*eixo_y));
+b = zeros(size,1);
+
+aw = @(i,j) i == 1;
+as = @(i,j) j == 1;
+ae = @(i,j) i == eixo_x;
+an = @(i,j) j == eixo_y;
+
+for j=1:eixo_y
+  for i=1:eixo_x
+
+    k = i + (j - 1)*eixo_x;
+    kp = (i + 1) + (j - 1)*eixo_x;
+    km = (i - 1) + (j - 1)*eixo_x;
+    kpp = i + ((j + 1) - 1)*eixo_x;
+    kmm = i + ((j - 1) - 1)*eixo_x;
+
+    ## west integral
+    if (!aw(i,j))
+      A(k,k)  -= dy(j)/dx(i);
+      A(k,km)  = dy(j)/dxhat(i-1);
+    elseif (aw(i,j) && fluxo(i,j))
+      b(k) -= fluxo(i,j)*dy(j);
+    end
+
+    ## South Integral
+    if (!as(i,j))
+      A(k,k)  -= dy(j)/dx(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+    end
+
+    ## East Integral
+    if (!ae(i,j))
+      A(k,k)  -=  dx(i)/dyhat(j-1);
+      A(k,kp) +=  A(k,kp)  = dy(j)/dxhat(i);
+    elseif (ae(i,j) && fluxo(i,j))
+      b(k) = -fluxo(i,j)*dy(j);
+    end
+
+    ## North Integral
+    if (!an(i,j))
+      A(k,k)  -= dx(i)/dyhat(j);
+      A(k,kpp) = dx(i)/dyhat(j);
+    end
+    
+  end
+end
+
+PHI = reshape (A'\b, eixo_x', eixo_y')';
+
+contour(PHI,50)
+

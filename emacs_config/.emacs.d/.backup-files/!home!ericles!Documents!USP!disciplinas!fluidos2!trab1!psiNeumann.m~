@@ -1,0 +1,230 @@
+
+h = 4;
+l = 6;
+
+eixo_x = 60;				# linhas
+eixo_y = 40;				# colunas
+
+dy = @(i) h/eixo_y;
+dx = @(i) l/eixo_x;
+dyhat = @(i) h/eixo_y;
+dxhat = @(i) l/eixo_x;
+
+## Métodos para diferenças finitas "centred, forward & backward", em x e em y
+Dcx = @(jj, ii, delta, M) (M(ii, jj + 1) - M(ii, jj - 1))/(2*delta);
+Dfx = @(jj, ii, delta, M) (M(ii, jj + 1) - M(ii, jj))/delta;
+Dbx = @(jj, ii, delta, M) (M(ii, jj) - M(ii, jj - 1))/delta;
+
+Dcy = @(jj, ii, delta, M) (M(ii + 1, jj) - M(ii - 1, jj))/(2*delta);
+Dfy = @(jj, ii, delta, M) (M(ii + 1, jj) - M(ii, jj))/delta;
+Dby = @(jj, ii, delta, M) (M(ii, jj) - M(ii - 1, jj))/delta;
+
+
+## fluxo(i,j) retorna o fluxo na posição (i,j) da malha
+fluxo = @(i,j) (((i == 1) && (j < eixo_y/h)) || ((i == eixo_x) && (j >  3*(eixo_y/h)))) * 5;
+
+A = sparse(zeros(eixo_x*eixo_y,eixo_x*eixo_y));
+
+for j=1:eixo_y
+  for i=1:eixo_x
+    k = i + (j - 1)*eixo_x;
+    kp = (i + 1) + (j - 1)*eixo_x;
+    km = (i - 1) + (j - 1)*eixo_x;
+    kpp = i + ((j + 1) - 1)*eixo_x;
+    kmm = i + ((j - 1) - 1)*eixo_x;
+
+    ## 
+    ## 9 casos (interior, 4 bordas e 4 cantos
+    ## Precisa definir A(k,k), A(k,kp,) A(k,km), A(k,kpp), A(k,kmm), b(k)
+    ##
+    
+    ## sem condição de contorno
+    if (i >= 2 && j >= 2 && i < eixo_x && j< eixo_y)
+      
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) + dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+
+      ## canto inferior esquerdo
+      ## adiciona integral oeste (-5dy) em b
+      ## e leste em Akk e adiciona termos Akm Akp 
+    elseif (j == 1 && i == 1)
+      A(k,k)   = -(dx(i)/dyhat(j) + dy(j)/dxhat(i-1));
+      A(k,kpp) = dx(i)/dyhat(j);
+      A(k,kp)  = dy(j)/dxhat(i);
+
+      b(k) = -fluxo(i,j)*dy(j);
+
+      ## canto inferior direito
+      ## integrais leste e sul se anulam, anulando kmm e kpp
+    elseif (j == 1 && i == eixo_x)	
+      ## fprintf("inf dir \n")
+      
+      A(k,k)   = -(dy(j)/dx(i-1) + dx(i)/dyhat(j));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+
+      ## canto superior direito
+      ## integral norte se anula, leste adiciona termo de fluxo a b(k)
+    elseif (i == eixo_x && j == eixo_y)
+      ## fprintf("sup dir \n")
+      
+      A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      ## A(k,kp)  = 0;
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      ## A(k,kpp) = 0;
+      
+      b(k) = fluxo(i,j)*dy(j);
+      
+    elseif (i == 1 && j == eixo_y)
+
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j-1));
+      A(k,km)  = 0;
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      ## A(k,kpp) = 0;
+
+      b(k) = 0;
+
+      ## borda inferior
+      ## integral sul se anula
+    elseif (j == 1)
+      
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kpp) = dx(i)/dyhat(j);
+
+      b(k) = 0;
+
+      ## borda direita
+      ## checa se há fluxo de saída
+    elseif (i == eixo_x)
+      
+      if fluxo(i,j)
+    	A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1) + dx(i)/dyhat(j));
+    	A(k,km)  = dy(j)/dxhat(i-1);
+     	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+      
+    	b(k) = fluxo(i,j)*dy(j);
+
+      else
+    	A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1) + dx(i)/dyhat(j));
+    	A(k,km)  = dy(j)/dxhat(i-1);
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+      
+    	b(k) = 0;
+      end
+
+      ## borda norte
+    elseif (j == eixo_y)
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+
+      b(k) = 0;
+      
+    	## borda esquerda
+    	## checa se há fluxo de entrada
+    elseif (i == 1)
+      
+      if fluxo(i,j)
+    	A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) +  dy(j)/dxhat(i-1));
+    	A(k,km)  = 0;
+    	A(k,kp)  = dy(j)/dxhat(i);
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+
+    	b(k) = -fluxo(i,j)*dy(j);
+      else
+    	A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) +  dy(j)/dxhat(i-1));
+    	A(k,km)  = 0;
+    	A(k,kp)  = dy(j)/dxhat(i);
+    	A(k,kmm) = dx(i)/dyhat(j-1);
+    	A(k,kpp) = dx(i)/dyhat(j);
+
+    	b(k) = 0;
+      end
+    end
+     
+  end
+end
+
+PHI = reshape (A\b', eixo_x, eixo_y)';
+
+PSIX = zeros(eixo_x, eixo_y);
+PSIY = zeros(eixo_x, eixo_y);
+
+for j=1:eixo_y
+  for i=1:eixo_x
+
+    ## sem condição de contorno
+    if (i > 1 && j > 1 && i < eixo_x && j < eixo_y)
+      
+      PSIX(i,j) = Dcx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dcy(i,j,dy(1),PHI);
+
+      ## Dcy(i,j,dy(1),PHI)
+      ## canto inferior esquerdo
+    elseif (j == 1 && i == 1)
+
+      PSIX(i,j) = Dfx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dfy(i,j,dy(1),PHI);
+
+      ## canto inferior direito
+    elseif (j == 1 && i == eixo_x)	
+
+      PSIX(i,j) = Dbx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dfy(i,j,dy(1),PHI);
+
+      ## canto superior direito
+    elseif (i == eixo_x && j == eixo_y)
+
+      PSIX(i,j) = Dbx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dby(i,j,dy(1),PHI);
+
+      ## canto superior esquerdo
+    elseif (i == 1 && j == eixo_y)
+
+      PSIX(i,j) = Dfx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dby(i,j,dy(1),PHI);
+
+      ## borda inferior
+    elseif (j == 1)
+
+      PSIX(i,j) = Dcx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dfy(i,j,dy(1),PHI);
+      
+      ## borda direita
+    elseif (i == eixo_x)
+
+      PSIX(i,j) = Dbx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dcy(i,j,dy(1),PHI);
+ 
+      ## borda norte
+    elseif (j == eixo_y)
+
+      PSIX(i,j) = Dcx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dby(i,j,dy(1),PHI);
+      
+    	## borda esquerda
+    elseif (i == 1)
+
+      PSIX(i,j) = Dfx(i,j,dx(1),PHI);
+      PSIY(i,j) = Dcy(i,j,dy(1),PHI);
+    end
+
+  end
+end
+
+quiver(PSIX', PSIY')

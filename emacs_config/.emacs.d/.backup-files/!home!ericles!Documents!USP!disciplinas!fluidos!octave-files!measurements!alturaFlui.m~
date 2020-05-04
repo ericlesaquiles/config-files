@@ -1,0 +1,9 @@
+function h = alturaFlui(x, t = 0, flag = 0)
+  global altura_flui;
+
+  if flag
+    h = altura_flui;
+  else
+    h = 1;
+  end
+end

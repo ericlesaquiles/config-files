@@ -1,0 +1,130 @@
+
+h = 2;				# altura
+l = 3;				# comprimento
+
+eixo_x = 30;				# linhas
+eixo_y = 20;				# colunas
+
+dy = @(i) h/eixo_y;
+dx = @(i) l/eixo_x;
+dyhat = @(i) h/eixo_y;
+dxhat = @(i) l/eixo_x;
+
+posy    = @(j) j * (h)/eixo_y;
+posx    = @(i) i * (l)/eixo_x;
+
+
+## helper function
+function fl = flu (i, j, posy, posx, eixo_x)
+  if i == 1 && posy(j) >= 1 && posy(j) <= 2
+    fl = 10;
+  elseif i == eixo_x
+    fl = 5;
+  end  
+endfunction
+
+fluxo = @(i,j) flu(i,j,posy,posx, eixo_x);
+
+
+
+## usage: isIn = interior (i, j)
+##
+##
+isIn = @(i, j) ...
+	((i > 1) && (j > 1) && j < eixo_y && i < eixo_x) ...
+       && ((posx(i) > 1) && (posy(j) > 2 - posx(i))) ;
+
+
+
+A = (zeros(eixo_x*eixo_y,eixo_x*eixo_y));
+
+for j=1:eixo_y
+  for i=1:eixo_x
+
+    k = i + (j - 1)*eixo_x;
+    kp = (i + 1) + (j - 1)*eixo_x;
+    km = (i - 1) + (j - 1)*eixo_x;
+    kpp = i + ((j + 1) - 1)*eixo_x;
+    kmm = i + ((j - 1) - 1)*eixo_x;
+
+    ## sem condição de contorno
+    if (isIn(i,j))
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) + dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+      b(k) = 0;
+
+      ## canto inferior esquerdo
+    elseif (posy(j) == 1 && i == 1)
+      A(k,k)   = -(dx(i)/dyhat(j) + dy(j)/dxhat(i-1));
+      A(k,kpp) = dx(i)/dyhat(j);
+      A(k,kp)  = dy(j)/dxhat(i);
+      b(k) = -fluxo(i,j)*dy(j);
+      ## canto inferior direito
+    elseif (j == 1 && i == eixo_x)	
+      A(k,k)   = -(dy(j)/dx(i-1) + dx(i)/dyhat(j));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+      b(k) = -fluxo(i,j)*dy(j);
+      ## canto superior direito
+    elseif (i == eixo_x && j == eixo_y)
+      A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      b(k) = -fluxo(i,j)*dy(j);
+    elseif (i == 1 && j == eixo_y)
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j-1));
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      b(k) = fluxo(i,j)*dy(j);
+      
+      ## borda sul
+    elseif (posy(j) == 1 || (j == 1 && posx(i) >= 2))
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kpp) = dx(i)/dyhat(j);
+      b(k) = 0;
+      ## borda leste
+    elseif (i == eixo_x)
+      A(k,k)   = -(dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1) + dx(i)/dyhat(j));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+      b(k) = -fluxo(i,j)*dy(j);
+      
+      ## borda norte
+    elseif (j == eixo_y)
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j-1) + dy(j)/dxhat(i-1));
+      A(k,km)  = dy(j)/dxhat(i-1);
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      b(k) = 0;
+
+      ## borda oeste
+    elseif (i == 1 && posy(j) >= 1)
+      A(k,k)   = -(dy(j)/dxhat(i) + dx(i)/dyhat(j) +  dy(j)/dxhat(i-1));
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kmm) = dx(i)/dyhat(j-1);
+      A(k,kpp) = dx(i)/dyhat(j);
+      b(k) = fluxo(i,j)*dy(j);
+
+      ## rampa
+    elseif (posx(i) > 1 && posy(j) == 2 - posx(i))
+      A(k,k)   = -(dx(i)/dyhat(j) + dx(i+1)/dyhat(j));
+      A(k,kp)  = dy(j)/dxhat(i);
+      A(k,kpp) = dx(i)/dyhat(j);
+      b(k) = 0;
+    end
+    
+  end
+end
+
+## A(550,:) = zeros(1,600);
+## A(550,550) = 1;
+
+PHI = reshape (A\b', eixo_x, eixo_y)';
+
+## contour(PHI,50)
