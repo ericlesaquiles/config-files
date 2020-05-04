@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/home/ericles/.oh-my-zsh
+export ZSH=~/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -58,19 +58,19 @@ plugins=(web-search git autojump)
 
 # User configuration
 
-# export ECLIPSEDIR="/home/ericles/Projetos/third-party-programs/eclipse/clp-2nd-try/bin/x86_64_linux"
-# export LD_LIBRARY_PATH="/home/ericles/Projetos/third-party-programs/eclipse/clp-2nd-try/lib/x86_64_linux"
+# export ECLIPSEDIR="~/Projetos/third-party-programs/eclipse/clp-2nd-try/bin/x86_64_linux"
+# export LD_LIBRARY_PATH="~/Projetos/third-party-programs/eclipse/clp-2nd-try/lib/x86_64_linux"
 
 # export MOSEKDIR="$HOME/Projetos/third-party-programs/mosek/mosek/8/tools/platform/linux64x86/bin"
 
-export PATH="$PATH":"usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/ericles/.gem/ruby/2.2.0/bin:/home/ericles/.gem/ruby/2.2.0/bin"
+export PATH="$PATH":"usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:~/.gem/ruby/2.2.0/bin:~/.gem/ruby/2.2.0/bin"
 # export PATH="$PATH":"/usr/local/Wolfram/Mathematica/11.2/Executables"                             # Mathematica directory
 export PATH="$PATH:$(ruby -e 'print Gem.user_dir')/bin"
-# export PATH="$PATH":"/home/ericles/Projetos/third-party-programs/eclipse/clp/bin/x86_64_linux" # Eclipse dir
+# export PATH="$PATH":"~/Projetos/third-party-programs/eclipse/clp/bin/x86_64_linux" # Eclipse dir
 #export PATH="$PATH":"$MOSEKDIR"
-export PATH="$PATH":"/home/ericles/Projetos/Programs/popcorn" #popcorn
+export PATH="$PATH":"~/Projetos/Programs/popcorn" #popcorn
 
-#export LD_LIBRARY_PATH="/home/ericles/Projetos/eclipse/eclipseclp.org/Distribution/Current/6.1_228_x86_64_linux/tcltk/x86_64_linux/lib"
+#export LD_LIBRARY_PATH="~/Projetos/eclipse/eclipseclp.org/Distribution/Current/6.1_228_x86_64_linux/tcltk/x86_64_linux/lib"
 # export MANPATH="/usr/local/man:$MANPATH"
 #export PYTHONPATH=$PYTHONPATH:`openrave-config --python-dir`
 
@@ -93,7 +93,7 @@ export EDITOR='emacs'
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 export LANG=en_US.UTF-8
 
-#export EUSDIR=/home/ericles/Projetos/JSK/jsk-projects/Jskeus2/eus/Linux64
+#export EUSDIR=~/Projetos/JSK/jsk-projects/Jskeus2/eus/Linux64
 
 # Rangercd stays on the last directory accessed by ranger
 rangercd () {
@@ -168,8 +168,8 @@ alias p3='python3'
 
 alias hrwros='singularity shell -p ~/Projetos/EdxCourses/HelloWorldWithROS/hrwros-09.simg'
 
-#alias gams /home/ericles/Documents/IC/LP/testing/gams/gams24.8_linux_x64_64_sfx/gams
-#alias gamslib /home/ericles/Documents/IC/LP/testing/gams/gams24.3_linux_x64_64_sfx/gamslib
+#alias gams ~/Documents/IC/LP/testing/gams/gams24.8_linux_x64_64_sfx/gams
+#alias gamslib ~/Documents/IC/LP/testing/gams/gams24.3_linux_x64_64_sfx/gamslib
 
 set splitbelow
 set splitright
@@ -182,7 +182,7 @@ bindkey '^R' history-incremental-search-backward
 #
 # bashrc.eus : environment variable for euslisp
 #
-export EUSDIR=/home/ericles/Projetos/JSK/jsk-projects/jskeus/eus
+export EUSDIR=~/Projetos/JSK/jsk-projects/jskeus/eus
 export ARCHDIR=Linux64
 export PATH=$EUSDIR/$ARCHDIR/bin:$EUSDIR/$ARCHDIR/lib:$PATH
 export LD_LIBRARY_PATH=$EUSDIR/$ARCHDIR/lib:$EUSDIR/$ARCHDIR/bin:$LD_LIBRARY_PATH
