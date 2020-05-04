@@ -1,0 +1,16 @@
+! Add bar (pipe) key on alt-a
+keycode  38 = a A a A bar AE ae
+!
+! Swap Caps_Lock and Control_L
+!
+remove Lock = Caps_Lock
+remove Control = Control_L
+keysym Control_L = Caps_Lock
+keysym Caps_Lock = Control_L
+add Lock = Caps_Lock
+add Control = Control_L
+!
+! Make PrtSc behave as Alt_L key
+!
+keycode 107 = Alt_L
+!keysym 108 = Alt_R
