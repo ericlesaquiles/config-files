@@ -1,4 +1,3 @@
-
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (global-prettify-symbols-mode t)
@@ -10,6 +9,8 @@
           (turn-on-auto-fill))
 
 (global-set-key (kbd "C-c q") 'auto-fill-mode)
+
+(setq-default auto-fill-function 'do-auto-fill)
 
 (global-subword-mode 1)
 
@@ -54,6 +55,31 @@
   :ensure t)
 
 (setq powerline-default-separator nil)
+
+(use-package multiple-cursors
+  :ensure t)
+(require 'multiple-cursors)
+
+;; When you have an active region that spans multiple lines, the
+;; following will add a cursor to each line:
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+
+;; When you want to add multiple cursors not based on continuous
+;; lines, but based on keywords in the buffer, use:
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+(use-package yasnippet
+    :ensure t)
+  (yas-global-mode 1)
+
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
+(use-package yasnippet-snippets
+  :ensure t)
 
 (use-package hungry-delete
   :ensure t
@@ -121,6 +147,9 @@
 ;;   :ensure t
 ;;   :bind ("C-s" . 'swiper))
 
+;; (use-package helm
+;;   :ensure t)
+
 (use-package fancy-battery
   :ensure t
   :config
@@ -136,7 +165,7 @@
 (add-to-list 'org-structure-template-alist
                '("sc" "#+BEGIN_SRC scheme\n?\n#+END_SRC"))
 
-(setq geiser-default-implementation 'racket)
+;; (setq geiser-default-implementation 'racket)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -146,7 +175,12 @@
    (R . t)
    (python . t)
    (C . t)
-   (sh . t)))
+   (shell . t)))
+
+(use-package company
+  :ensure t
+  :init
+  (add-hook 'after-init-hook 'global-company-mode))
 
 ;; (load (expand-file-name "~/.roswell/helper.el"))
 ;; (setq inferior-lisp-program "ros -Q run")
@@ -220,20 +254,35 @@
   :ensure t)
 
 (use-package paredit
-             :ensure t
-             :config
-(add-hook 'racket-mode-hook #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook #'enable-paredit-mode))
+  :ensure t
+  :config
+  (dolist (m '(emacs-lisp-mode-hook
+	       racket-mode-hook
+	       racket-repl-mode-hook))
+    (add-hook m #'paredit-mode))
+  (bind-keys :map paredit-mode-map
+	     ("{"   . paredit-open-curly)
+	     ("}"   . paredit-close-curly))
+  (unless terminal-frame
+    (bind-keys :map paredit-mode-map
+	       ("M-[" . paredit-wrap-square)
+	       ("M-{" . paredit-wrap-curly))))
+
+;; (use-package paredit
+;; 	     :ensure t
+;; 	     :config
+;; (add-hook 'racket-mode-hook #'enable-paredit-mode)
+;; (add-hook 'lisp-mode-hook #'enable-paredit-mode))
 
 ;; (use-package scheme-smart-complete
 ;;   :ensure t)
 
-(setq scheme-program-name "racket")
+;; (setq scheme-program-name "racket")
 
-(setq auto-mode-alist (cons '("\\.scm" . racket-mode) auto-mode-alist))
+;; (setq auto-mode-alist (cons '("\\.scm" . racket-mode) auto-mode-alist))
 
-(use-package geiser
-  :ensure t)
+;; (use-package geiser
+;;   :ensure t)
 
 (defun mechanics ()
   (interactive)
@@ -241,13 +290,15 @@
    "/usr/local/scmutils/mit-scheme/bin/scheme --library /usr/local/scmutils/mit-scheme/lib"
   ))
 
+(use-package julia-mode
+  :ensure t)
+
 (autoload 'eclipse-mode "/home/ericles/.emacs.d/eclipse_emacs/eclipse.el" "ECLIPSE editing mode" t)
 (setq auto-mode-alist (cons '("\\.pl" . eclipse-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.ecl" . eclipse-mode) auto-mode-alist))
 
-;(use-package ess
-;  :ensure t
-;  :init (require 'ess-site))
+(use-package sml-mode
+  :ensure t)
 
 (setq auto-mode-alist
       (cons
@@ -257,6 +308,29 @@
     (lambda () (progn (setq octave-comment-char ?%)
                       (setq comment-start "% ")
                       (setq comment-add 0))))
+
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+(setq elpy-rpc-python-command "python3")
+
+(use-package seeing-is-believing
+  :ensure t)
+;(setq seeing-is-believing-prefix "C-.")
+(add-hook 'ruby-mode-hook 'seeing-is-believing)
+
+(use-package inf-ruby
+  :ensure t)
+(autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+(add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+
+(use-package csharp-mode
+  :ensure t)
+
+;(use-package ess
+;  :ensure t
+;  :init (require 'ess-site))
 
 ;; (use-package tex-site
 ;;   :ensure auctex
@@ -277,17 +351,17 @@
 ;;                 (setq TeX-source-correlate-method 'synctex)
 ;;                 (setq TeX-source-correlate-start-server t)))
 
-;;   ;; Update PDF buffers after successful LaTeX runs
-;;   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-;;               #'TeX-revert-document-buffer)
+;; ;;   ;; Update PDF buffers after successful LaTeX runs
+;; ;;   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+;; ;;               #'TeX-revert-document-buffer)
 
-;;   ;; to use pdfview with auctex
-;;   (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+;; ;;   ;; to use pdfview with auctex
+;; ;;   (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
 
-;;   ;; to use pdfview with auctex
-;;   (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
-;;           TeX-source-correlate-start-server t)
-;;   (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
+;; ;;   ;; to use pdfview with auctex
+;; ;;   (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+;; ;;           TeX-source-correlate-start-server t)
+;; ;;   (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
 
 ;; (use-package auctex
 ;;   :ensure t)
@@ -297,6 +371,26 @@
   :ensure auctex
   :config
   (setq TeX-auto-save t))
+
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(setq reftex-plug-into-AUCTeX t)
+
+(setq TeX-PDF-mode t)
+(require 'tex)
+(TeX-global-PDF-mode t)
+
+(use-package latex-preview-pane
+  :ensure t)
+
+(latex-preview-pane-enable)
 
 (setq org-src-window-setup 'current-window)
 
@@ -329,7 +423,7 @@
              (er-refresh-etags extension)
              ad-do-it))))
 
-(setq ido-enable-flex-matching nil)
+(setq ido-enable-flex-matching t)
 (setq ido-create-new-buffer 'always)
 (setq ido-everywhere t)
 (ido-mode 1)
