@@ -13,10 +13,12 @@
 #+END_SRC
 *** Autofill mode
 #+BEGIN_SRC emacs-lisp
-(add-hook 'text-mode-hook
-	  (turn-on-auto-fill))
+  (add-hook 'text-mode-hook
+            (turn-on-auto-fill))
 
-(global-set-key (kbd "C-c q") 'auto-fill-mode)
+  (global-set-key (kbd "C-c q") 'auto-fill-mode)
+
+  (setq-default auto-fill-function 'do-auto-fill)
 #+END_SRC
 *** Subword
 #+BEGIN_SRC emacs-lisp
@@ -85,6 +87,36 @@
 *** No separator
 #+BEGIN_SRC emacs-lisp
   (setq powerline-default-separator nil)
+#+END_SRC
+*** Add multiple cursors (mark-multiple)
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+    :ensure t)
+  (require 'multiple-cursors)
+
+  ;; When you have an active region that spans multiple lines, the
+  ;; following will add a cursor to each line:
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+
+  ;; When you want to add multiple cursors not based on continuous
+  ;; lines, but based on keywords in the buffer, use:
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+#+END_SRC
+*** add Yasnippet for code snippets
+#+BEGIN_SRC emacs-lisp
+    (use-package yasnippet
+      :ensure t)
+    (yas-global-mode 1)
+
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  (package-initialize)
+
+  (use-package yasnippet-snippets
+    :ensure t)
+
 #+END_SRC
 ** Packages 
 **** Hungry-delete (delete white-spaces)
@@ -177,6 +209,11 @@
   ;;   :ensure t
   ;;   :bind ("C-s" . 'swiper))
 #+END_SRC
+**** Add helm for code completion
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package helm
+  ;;   :ensure t)
+#+END_SRC
 ** Battery usage
 #+BEGIN_SRC emacs-lisp
   (use-package fancy-battery
@@ -198,7 +235,7 @@
 #+END_SRC
 ** Org-babel language running
 #+BEGIN_SRC emacs-lisp
-  (setq geiser-default-implementation 'racket)
+  ;; (setq geiser-default-implementation 'racket)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -208,148 +245,208 @@
      (R . t)
      (python . t)
      (C . t)
-     (sh . t)))
+     (shell . t)))
 #+END_SRC
-* lisp/scheme/racket
-** Roswell Settings
+** [#B] Company (auto-complete)
 #+BEGIN_SRC emacs-lisp
-  ;; (load (expand-file-name "~/.roswell/helper.el"))
-  ;; (setq inferior-lisp-program "ros -Q run")
-  ;; (custom-set-variables
-  ;;  ;; custom-set-variables was added by Custom.
-  ;;  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;;  ;; Your init file should contain only one such instance.
-  ;;  ;; If there is more than one, they won't work right.
-  ;;  '(safe-local-variable-values
-  ;;    (quote
-  ;;     ((Package . Kernel)
-  ;;      (Log . C\.Log)
-  ;;      (Package . LISP)
-  ;;      (Package . KERNEL)
-  ;;      (Package . Lisp)
-  ;;      (Log . code\.log)
-  ;;      (Package . conditions)
-  ;;      (Lowercase . T)
-  ;;      (Base . 10)
-  ;;      (Package . loop)
-  ;;      (whitespace-style quote
-  ;;                        (face trailing empty tabs))
-  ;;      (whitespace-action)))))
-  ;; (custom-set-faces
-  ;;  ;; custom-set-faces was added by Custom.
-  ;;  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;;  ;; Your init file should contain only one such instance.
-  ;;  ;; If there is more than one, they won't work right.
-  ;;  )
-
-  ;; (setq create-lockfiles nil)
+  (use-package company
+    :ensure t
+    :init
+    (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
-** EusLisp euslime settings
+* Programming
+** [#B] Add auto-complete
+** lisp/scheme/racket
+*** Roswell Settings
+ #+BEGIN_SRC emacs-lisp
+   ;; (load (expand-file-name "~/.roswell/helper.el"))
+   ;; (setq inferior-lisp-program "ros -Q run")
+   ;; (custom-set-variables
+   ;;  ;; custom-set-variables was added by Custom.
+   ;;  ;; If you edit it by hand, you could mess it up, so be careful.
+   ;;  ;; Your init file should contain only one such instance.
+   ;;  ;; If there is more than one, they won't work right.
+   ;;  '(safe-local-variable-values
+   ;;    (quote
+   ;;     ((Package . Kernel)
+   ;;      (Log . C\.Log)
+   ;;      (Package . LISP)
+   ;;      (Package . KERNEL)
+   ;;      (Package . Lisp)
+   ;;      (Log . code\.log)
+   ;;      (Package . conditions)
+   ;;      (Lowercase . T)
+   ;;      (Base . 10)
+   ;;      (Package . loop)
+   ;;      (whitespace-style quote
+   ;;                        (face trailing empty tabs))
+   ;;      (whitespace-action)))))
+   ;; (custom-set-faces
+   ;;  ;; custom-set-faces was added by Custom.
+   ;;  ;; If you edit it by hand, you could mess it up, so be careful.
+   ;;  ;; Your init file should contain only one such instance.
+   ;;  ;; If there is more than one, they won't work right.
+   ;;  )
+
+   ;; (setq create-lockfiles nil)
+ #+END_SRC
+*** EusLisp euslime settings
+ #+BEGIN_SRC emacs-lisp
+   ;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/slime")
+   ;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/euslime")
+   ;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/slime-repl-ansi-color")
+   ;; (require 'slime-autoloads)
+   ;; (require 'euslime)
+   ;; (setq inferior-lisp-program "sbcl")
+   ;; (setq inferior-euslisp-program "roseus")
+   ;; (slime-setup '(slime-fancy slime-repl-ansi-color slime-banner))
+ #+END_SRC
+*** Slime settings
+ #+BEGIN_SRC emacs-lisp
+   (load (expand-file-name "~/quicklisp/slime-helper.el"))
+     ;; Replace "sbcl" with the path to your implementation
+   (setq inferior-lisp-program "sbcl")
+
+   ;; (setq slime-lisp-implementations
+   ;;       '((sbcl ("sbcl" "--conre" "~/.emacs.d/sbcl.core-for-slime"))))
+
+   ;; (use-package slime
+   ;;   :ensure t)
+
+   (slime-setup)
+
+   (setq slime-startup-animation t)
+
+   ;; (setq inferior-lisp-program "/usr/local/bin/ccl")
+   ;; ;;(setq inferior-lisp "/usr/bin/sbcl")
+   ;; ;;(setq slime-default-lisp "/usr/local/bin/ccl")
+   ;; ;;(setq slime-lisp-implementations
+   ;; ;;  '((ccl ("ccl" "-quiet"))
+   ;; ;;    (sbcl ("/usr/bin/sbcl") :coding-system utf-8-unix))
+
+   (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+   (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+
+   (setq slime-contribs '(slime-fancy))
+
+   ;; (global-set-key "\C-cs" 'slime-selector)  ;; Set key binding to slime-selector
+
+
+ #+END_SRC
+*** Racket-mode settings
+ #+BEGIN_SRC emacs-lisp
+   (use-package racket-mode
+     :ensure t)
+ #+END_SRC
+*** Parenthesis and other delimiter niceties
+ #+BEGIN_SRC emacs-lisp
+   (use-package paredit
+     :ensure t
+     :config
+     (dolist (m '(emacs-lisp-mode-hook
+		  racket-mode-hook
+		  racket-repl-mode-hook))
+       (add-hook m #'paredit-mode))
+     (bind-keys :map paredit-mode-map
+		("{"   . paredit-open-curly)
+		("}"   . paredit-close-curly))
+     (unless terminal-frame
+       (bind-keys :map paredit-mode-map
+		  ("M-[" . paredit-wrap-square)
+		  ("M-{" . paredit-wrap-curly))))
+
+   ;; (use-package paredit
+   ;; 	     :ensure t
+   ;; 	     :config
+   ;; (add-hook 'racket-mode-hook #'enable-paredit-mode)
+   ;; (add-hook 'lisp-mode-hook #'enable-paredit-mode))
+ #+END_SRC
+*** (not) Scheme smart-complete
+ #+BEGIN_SRC emacs-lisp
+   ;; (use-package scheme-smart-complete
+   ;;   :ensure t)
+ #+END_SRC
+*** (not) Make Racket run scheme code
+ #+BEGIN_SRC emacs-lisp
+;; (setq scheme-program-name "racket")
+ #+END_SRC
+*** (not) Make racket-mode into scheme
+ #+BEGIN_SRC emacs-lisp
+   ;; (setq auto-mode-alist (cons '("\\.scm" . racket-mode) auto-mode-alist))
+ #+END_SRC
+*** (not) Make Geiser deal with scheme code
+ #+BEGIN_SRC emacs-lisp
+   ;; (use-package geiser
+   ;;   :ensure t)
+ #+END_SRC
+*** Run sussman's Mechanics from emacs
+ #+BEGIN_SRC emacs-lisp
+   (defun mechanics ()
+     (interactive)
+     (run-scheme 
+      "/usr/local/scmutils/mit-scheme/bin/scheme --library /usr/local/scmutils/mit-scheme/lib"
+     ))
+ #+END_SRC
+** Julia
 #+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/slime")
-  ;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/euslime")
-  ;; (add-to-list 'load-path "~/Projetos/Programming/Lisp/JSK/euslime_dir/slime-repl-ansi-color")
-  ;; (require 'slime-autoloads)
-  ;; (require 'euslime)
-  ;; (setq inferior-lisp-program "sbcl")
-  ;; (setq inferior-euslisp-program "roseus")
-  ;; (slime-setup '(slime-fancy slime-repl-ansi-color slime-banner))
-#+END_SRC
-** Slime settings
-#+BEGIN_SRC emacs-lisp
-  (load (expand-file-name "~/quicklisp/slime-helper.el"))
-    ;; Replace "sbcl" with the path to your implementation
-  (setq inferior-lisp-program "sbcl")
-
-  ;; (setq slime-lisp-implementations
-  ;;       '((sbcl ("sbcl" "--conre" "~/.emacs.d/sbcl.core-for-slime"))))
-
-  ;; (use-package slime
-  ;;   :ensure t)
-
-  (slime-setup)
-
-  (setq slime-startup-animation t)
-
-  ;; (setq inferior-lisp-program "/usr/local/bin/ccl")
-  ;; ;;(setq inferior-lisp "/usr/bin/sbcl")
-  ;; ;;(setq slime-default-lisp "/usr/local/bin/ccl")
-  ;; ;;(setq slime-lisp-implementations
-  ;; ;;  '((ccl ("ccl" "-quiet"))
-  ;; ;;    (sbcl ("/usr/bin/sbcl") :coding-system utf-8-unix))
-
-  (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
-  (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
-
-  (setq slime-contribs '(slime-fancy))
-
-  ;; (global-set-key "\C-cs" 'slime-selector)  ;; Set key binding to slime-selector
-
-
-#+END_SRC
-** Racket-mode settings
-#+BEGIN_SRC emacs-lisp
-  (use-package racket-mode
+  (use-package julia-mode
     :ensure t)
 #+END_SRC
-** Parenthesis and other delimiter niceties
+** Eclipse CLP
+*** Settings
+ #+BEGIN_SRC emacs-lisp
+   (autoload 'eclipse-mode "/home/ericles/.emacs.d/eclipse_emacs/eclipse.el" "ECLIPSE editing mode" t)
+   (setq auto-mode-alist (cons '("\\.pl" . eclipse-mode) auto-mode-alist))
+   (setq auto-mode-alist (cons '("\\.ecl" . eclipse-mode) auto-mode-alist))
+ #+END_SRC
+** Standar ML (SML/NJ)
+*** Add SML mode
 #+BEGIN_SRC emacs-lisp
-  (use-package paredit
-               :ensure t
-               :config
-  (add-hook 'racket-mode-hook #'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook #'enable-paredit-mode))
-#+END_SRC
-** Scheme smart-complete
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package scheme-smart-complete
-  ;;   :ensure t)
-#+END_SRC
-** Make Racket run scheme code
-#+BEGIN_SRC emacs-lisp
-  (setq scheme-program-name "racket")
-#+END_SRC
-** Make racket-mode into scheme
-#+BEGIN_SRC emacs-lisp
-  (setq auto-mode-alist (cons '("\\.scm" . racket-mode) auto-mode-alist))
-#+END_SRC
-** Make Geiser deal with scheme code
-#+BEGIN_SRC emacs-lisp
-  (use-package geiser
+  (use-package sml-mode
     :ensure t)
 #+END_SRC
-** Run sussman's Mechanics from emacs
+** Octave
+*** Recognize
+ #+BEGIN_SRC emacs-lisp
+   (setq auto-mode-alist
+         (cons
+          '("\\.m$" . octave-mode)
+          auto-mode-alist))
+   (add-hook 'octave-mode-hook
+       (lambda () (progn (setq octave-comment-char ?%)
+                         (setq comment-start "% ")
+                         (setq comment-add 0))))
+ #+END_SRC
+** Python
 #+BEGIN_SRC emacs-lisp
-  (defun mechanics ()
-    (interactive)
-    (run-scheme 
-     "/usr/local/scmutils/mit-scheme/bin/scheme --library /usr/local/scmutils/mit-scheme/lib"
-    ))
+  (use-package elpy
+    :ensure t
+    :init
+    (elpy-enable))
+  (setq elpy-rpc-python-command "python3")
 #+END_SRC
-* Eclipse CLP
-** Settings
+** Ruby
 #+BEGIN_SRC emacs-lisp
-  (autoload 'eclipse-mode "/home/ericles/.emacs.d/eclipse_emacs/eclipse.el" "ECLIPSE editing mode" t)
-  (setq auto-mode-alist (cons '("\\.pl" . eclipse-mode) auto-mode-alist))
-  (setq auto-mode-alist (cons '("\\.ecl" . eclipse-mode) auto-mode-alist))
+   (use-package seeing-is-believing
+     :ensure t)
+   ;(setq seeing-is-believing-prefix "C-.")
+   (add-hook 'ruby-mode-hook 'seeing-is-believing)
+
+   (use-package inf-ruby
+     :ensure t)
+   (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+   (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+#+END_SRC
+** C# mode
+#+BEGIN_SRC emacs-lisp
+  (use-package csharp-mode
+    :ensure t)
 #+END_SRC
 * Statistics
 #+BEGIN_SRC emacs-lisp
 ;(use-package ess
 ;  :ensure t
 ;  :init (require 'ess-site))
-#+END_SRC
-* Octave
-** Recognize
-#+BEGIN_SRC emacs-lisp
-  (setq auto-mode-alist
-        (cons
-         '("\\.m$" . octave-mode)
-         auto-mode-alist))
-  (add-hook 'octave-mode-hook
-      (lambda () (progn (setq octave-comment-char ?%)
-                        (setq comment-start "% ")
-                        (setq comment-add 0))))
 #+END_SRC
 * Tex
 ** Config
@@ -373,17 +470,17 @@
   ;;                 (setq TeX-source-correlate-method 'synctex)
   ;;                 (setq TeX-source-correlate-start-server t)))
 
-  ;;   ;; Update PDF buffers after successful LaTeX runs
-  ;;   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-  ;;               #'TeX-revert-document-buffer)
+  ;; ;;   ;; Update PDF buffers after successful LaTeX runs
+  ;; ;;   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+  ;; ;;               #'TeX-revert-document-buffer)
 
-  ;;   ;; to use pdfview with auctex
-  ;;   (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+  ;; ;;   ;; to use pdfview with auctex
+  ;; ;;   (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
 
-  ;;   ;; to use pdfview with auctex
-  ;;   (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
-  ;;           TeX-source-correlate-start-server t)
-  ;;   (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
+  ;; ;;   ;; to use pdfview with auctex
+  ;; ;;   (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+  ;; ;;           TeX-source-correlate-start-server t)
+  ;; ;;   (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
 
   ;; (use-package auctex
   ;;   :ensure t)
@@ -393,6 +490,27 @@
     :ensure auctex
     :config
     (setq TeX-auto-save t))
+
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+
+  (setq TeX-PDF-mode t)
+  (require 'tex)
+  (TeX-global-PDF-mode t)
+
+  (use-package latex-preview-pane
+    :ensure t)
+
+  (latex-preview-pane-enable)
+
 #+END_SRC
 * Org
 ** Basic config
@@ -435,7 +553,7 @@
 * IDO
 ** Enable IDO-mode
 #+BEGIN_SRC emacs-lisp
-  (setq ido-enable-flex-matching nil)
+  (setq ido-enable-flex-matching t)
   (setq ido-create-new-buffer 'always)
   (setq ido-everywhere t)
   (ido-mode 1)
